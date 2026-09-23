@@ -3,6 +3,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import type { ExampleDto } from "@/server/application/dto/example/example.dto";
+import type { ListExamplesResponse } from "@/server/entry/api/internal/examples";
 import { ExampleList } from "../../_components/example-list";
 
 // 入力が止まってから検索するまでの時間（docs/02_共通設計/04_データ取得・更新.md の「5.2」）
@@ -14,7 +15,7 @@ async function fetchExamples(keyword: string): Promise<ExampleDto[]> {
   if (!response.ok) {
     throw new Error("検索に失敗しました");
   }
-  const body: { data: ExampleDto[] } = await response.json();
+  const body: ListExamplesResponse = await response.json();
   return body.data;
 }
 
