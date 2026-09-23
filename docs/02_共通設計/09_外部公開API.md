@@ -93,15 +93,29 @@
 
 ### 失敗したとき
 
+RFC 9457（Problem Details for HTTP APIs）の形にする（[ADR-010](../04_設計判断/ADR-010_APIのエラーの形.md)）。`Content-Type` は `application/problem+json`。
+
 ```json
 {
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "入力内容を確認してください",
-    "details": { "title": ["タイトルを入力してください"] }
-  }
+  "type": "about:blank",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "入力内容を確認してください",
+  "code": "VALIDATION_ERROR",
+  "errors": { "title": ["タイトルを入力してください"] }
 }
 ```
+
+| 項目 | 種類 | 内容 |
+| ---- | ---- | ---- |
+| `type` | 規格 | 常に `about:blank`（HTTP のステータスコードの意味どおり、という規格の既定値） |
+| `title` | 規格 | ステータスコードの英語の名前（`Bad Request`、`Not Found` など） |
+| `status` | 規格 | HTTP のステータスコードと同じ数値 |
+| `detail` | 規格 | 利用者向けの日本語のメッセージ。内部の情報は入れない |
+| `code` | 追加 | 何のエラーかを機械的に判定するための文字列（下の「ステータスコード」の表） |
+| `errors` | 追加 | 入力欄ごとのエラー（`{ 項目名: メッセージの配列 }`）。`code` が `VALIDATION_ERROR` のときだけ付ける |
+
+- 規格の `instance` は使わない
 
 ### ステータスコード
 
@@ -117,6 +131,8 @@
 | `500` | 想定外のエラー | `INTERNAL_ERROR` |
 
 - `500` のときは、内部の情報（スタックトレース、SQL）を返さない（[06 エラー処理](./06_エラー処理.md)）
+- 想定外のエラーを中で捕まえて `500` を返すため、エラー監視（`onRequestError`）には届かない。対応は [07 ログ・監視](./07_ログ・監視.md) の「5. 未決事項」
+- 失敗したときのレスポンスは、`src/server/entry/api/problem-details.ts` の `problemResponse()` で作る。画面用の Route Handler（`/api/internal/`）も同じ形にする（[04 データ取得・更新](./04_データ取得・更新.md) の「5.2」）
 
 ## 7. 大量アクセス対策
 
@@ -149,13 +165,13 @@ import { container } from "@/server/infrastructure/di/container";
 import { ListPublishedPostsUseCase } from "@/server/application/usecase/post/list-published-posts.usecase";
 import { verifyApiKey } from "@/server/infrastructure/api/verify-api-key";
 import { toPublicPost } from "./public-post";
-import { errorResponse } from "./error-response";
+import { problemResponse } from "../problem-details";
 
 export async function GET(request: Request) {
   // 1. 認証
   const client = await verifyApiKey(request.headers.get("authorization"));
   if (!client) {
-    return errorResponse(401, "UNAUTHORIZED", "API キーが正しくありません");
+    return problemResponse({ status: 401, code: "UNAUTHORIZED", detail: "API キーが正しくありません" });
   }
 
   // 2. 画面と同じユースケースを呼ぶ
@@ -167,7 +183,7 @@ export async function GET(request: Request) {
     return Response.json({ data: posts.map(toPublicPost) });
   } catch (error) {
     console.error(error);
-    return errorResponse(500, "INTERNAL_ERROR", "エラーが発生しました");
+    return problemResponse({ status: 500, code: "INTERNAL_ERROR", detail: "エラーが発生しました" });
   }
 }
 ```
@@ -179,3 +195,4 @@ export async function GET(request: Request) {
 | YYYY-MM-DD | 新規作成 | |
 | 2026-09-23 | 実装の例を、中身を `src/server/entry/api/` に置く形にした（[ADR-008](../04_設計判断/ADR-008_フロントとバックの分け方.md)） | |
 | 2026-09-23 | 外部向けの型の置き場所を追記（[ADR-009](../04_設計判断/ADR-009_APIのレスポンスの型.md)） | |
+| 2026-09-23 | 失敗したときの形を RFC 9457（Problem Details）に変更。`problemResponse()` を `src/server/entry/api/` に置き、画面用の Route Handler と共用にした（[ADR-010](../04_設計判断/ADR-010_APIのエラーの形.md)） | |
