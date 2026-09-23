@@ -1,0 +1,28 @@
+{
+  "name": "Next Template",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+
+  // ソースコードを/workspaceにマウントして開く
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [3000],
+
+  // vsコードユーザーで実行
+  "remoteUser": "vscode",
+
+  // Claude Codeのログイン情報を保持（コンテナを作り直しても再ログイン不要）
+  "mounts": ["source=claude-config,target=/home/vscode/.claude,type=volume"],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "donjayamanne.githistory",
+        "esbenp.prettier-vscode",
+        "Gruntfuggly.todo-tree"
+      ]
+    }
+  }
+}
