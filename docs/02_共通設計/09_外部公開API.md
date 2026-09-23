@@ -135,13 +135,21 @@
 
 ## 9. 実装の例
 
+中身は `src/server/entry/api/` に書き、`src/app/` の `route.ts` はそれを読み込むだけにする（[06 アーキテクチャ](../01_全体設計/06_アーキテクチャ.md) の「4.1 入口」）。
+
 ```ts
 // src/app/api/v1/posts/route.ts
-import { container } from "@/infrastructure/di/container";
-import { ListPublishedPostsUseCase } from "@/application/usecase/post/list-published-posts.usecase";
-import { verifyApiKey } from "@/infrastructure/api/verify-api-key";
+export { GET } from "@/server/entry/api/v1/posts";
+```
+
+```ts
+// src/server/entry/api/v1/posts.ts
+import "server-only";
+import { container } from "@/server/infrastructure/di/container";
+import { ListPublishedPostsUseCase } from "@/server/application/usecase/post/list-published-posts.usecase";
+import { verifyApiKey } from "@/server/infrastructure/api/verify-api-key";
 import { toPublicPost } from "./public-post";
-import { errorResponse } from "@/app/api/v1/_lib/error-response";
+import { errorResponse } from "./error-response";
 
 export async function GET(request: Request) {
   // 1. 認証
@@ -169,3 +177,4 @@ export async function GET(request: Request) {
 | 日付 | 変更内容 | 変更者 |
 | ---- | -------- | ------ |
 | YYYY-MM-DD | 新規作成 | |
+| 2026-09-23 | 実装の例を、中身を `src/server/entry/api/` に置く形にした（[ADR-008](../04_設計判断/ADR-008_フロントとバックの分け方.md)） | |

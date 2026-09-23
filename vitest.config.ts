@@ -18,7 +18,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       // 目標を置くのはドメイン層とユースケースだけ（docs/02_共通設計/10_テスト.md）
-      include: ["src/domain/**/*.ts", "src/application/**/*.ts"],
+      include: ["src/server/domain/**/*.ts", "src/server/application/**/*.ts"],
       exclude: ["**/*.test.ts"],
       thresholds: {
         lines: 80,

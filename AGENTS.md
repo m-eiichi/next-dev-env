@@ -18,16 +18,18 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ### アーキテクチャ（`docs/01_全体設計/06_アーキテクチャ.md`）
 
-- 層は `src/domain/`（業務のルール）→ `src/application/`（ユースケース、DTO）→ `src/infrastructure/`（DB・認証の実装、DI コンテナ）に分ける。依存は外側から内側への一方向だけ
+- `src/server/` の外（`src/app/`、`src/components/`、`src/hooks/`）がフロント、中がバック。フロントが `src/server/` から import してよいのは `src/server/entry/` の関数と DTO の型だけ（`docs/04_設計判断/ADR-008_フロントとバックの分け方.md`）
+- バックは `src/server/entry/`（入口）→ `src/server/application/`（ユースケース、DTO）→ `src/server/domain/`（業務のルール）に分け、`src/server/infrastructure/`（DB・認証の実装、DI コンテナ）がドメイン層のインターフェースを実装する。依存は外側から内側への一方向だけ
 - ドメイン層は Next.js、React、DB クライアント、Zod を import しない
 - ユースケースは依存をコンストラクタで受け取る。ユースケースの中で DI コンテナを使ったり、実装を `new` したりしない
-- 依存の組み立て（Composition Root）は入口（Server Component / Server Action / Route Handler）で行う
+- 依存の組み立て（Composition Root）は入口（`src/server/entry/`）だけで行う。`page.tsx` は取得の関数を呼んで部品に渡すだけ、`route.ts` は `src/server/entry/api/` から読み込むだけにする
 - Client Component にはエンティティではなく DTO（プレーンなオブジェクト）を渡す
-- `src/application/` と `src/infrastructure/` のファイルの先頭には `import "server-only"` を書く
+- `src/server/application/`、`src/server/infrastructure/`、`src/server/entry/queries/`、`src/server/entry/api/` のファイルの先頭には `import "server-only"` を書く（DTO と、`'use server'` を書く `src/server/entry/actions/` は除く）
 
 ### データの取得・更新（`docs/02_共通設計/04_データ取得・更新.md`）
 
-- 画面の取得は Server Component、更新は Server Action で行う。画面から `fetch('/api/...')` で自前の API を呼ばない
+- 画面の取得は Server Component から `src/server/entry/queries/` の関数を呼んで行い、更新は `src/server/entry/actions/` の Server Action で行う。画面から `fetch('/api/...')` で自前の API を呼ばない
+- Server Action は `src/app/` の中に置かない（1 画面だけで使うものも `src/server/entry/actions/` に置く）
 - Route Handler は外部公開 API（`src/app/api/v1/`）、Webhook（`src/app/api/webhooks/`）、画面用の例外（`src/app/api/internal/`）だけに使う（`docs/02_共通設計/09_外部公開API.md`）
 - Server Action の戻り値は `ActionResult` の形にそろえる。想定内のエラーは戻り値で返し、想定外のものだけ `throw` する
 
