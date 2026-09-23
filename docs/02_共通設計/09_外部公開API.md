@@ -1,0 +1,171 @@
+# 09 外部公開 API
+
+<!--
+  外部（他のサーバー、スマホアプリ、外部サービスからの Webhook）に公開する API のルールを書く。
+  外部に公開する API も Webhook もないなら、このファイルは消してよい。
+  画面から使う取得・更新のルールは 04_データ取得・更新 に書く。
+-->
+
+## 1. 基本方針
+
+| 項目 | ルール |
+| ---- | ------ |
+| 画面の取得・更新 | 外部公開 API は使わない。Server Component / Server Action で行う（[04 データ取得・更新](./04_データ取得・更新.md)） |
+| 外部公開 API | 外部から呼ぶ必要がある操作だけを公開する |
+| 中身の処理 | 画面と同じユースケースを呼ぶ。業務のルールを API 側に書かない（[06 アーキテクチャ](../01_全体設計/06_アーキテクチャ.md)） |
+
+### 画面から外部公開 API を呼ばない理由
+
+- 画面の都合（表示項目の追加など）で、外部の利用者がいる API を変えたくなる状況を避けるため
+- 画面用には Server Component / Server Action の方が速く、コードも少ないため
+
+画面から Route Handler を使う必要がある場合（Client Component からの GET、ファイルのダウンロードなど）は、外部公開 API とは分けて置く（下の「2. 置き場所」）。
+
+## 2. 置き場所
+
+| 種類 | 置き場所 | 呼び出し元 | 例 |
+| ---- | -------- | ---------- | -- |
+| 外部公開 API | `src/app/api/v1/` | 外部のサーバー、アプリ | `src/app/api/v1/posts/route.ts` |
+| Webhook の受け口 | `src/app/api/webhooks/` | 外部サービス | `src/app/api/webhooks/stripe/route.ts` |
+| 画面用の Route Handler | `src/app/api/internal/` | 自分のアプリの画面だけ | ファイルのダウンロードなど |
+
+- `api/v1/` の下を見れば、外部に公開しているものがすべてわかる状態を保つ
+
+## 3. 公開する API の一覧
+
+<!-- 公開する API を追加したら、ここに書く -->
+
+| No | メソッド | パス | 概要 | 呼び出し元 | 認証 |
+| -- | -------- | ---- | ---- | ---------- | ---- |
+| 1 | （例）GET | `/api/v1/posts` | 公開済みの投稿の一覧 | （例）スマホアプリ | API キー |
+| 2 | （例）POST | `/api/webhooks/stripe` | 決済完了の通知 | Stripe | 署名の検証 |
+
+- 詳しい仕様（リクエスト・レスポンスの項目）は OpenAPI などで別に管理する / このファイルに書く
+
+## 4. 認証
+
+| 項目 | 外部公開 API | Webhook |
+| ---- | ------------ | ------- |
+| 方式 | API キー / トークン（OAuth のクライアント認証情報など） | 送信元サービスの署名を検証する |
+| 送り方 | `Authorization: Bearer <キー>` ヘッダー | サービスごとのヘッダー（例: `Stripe-Signature`） |
+| 発行・管理 | 管理画面で発行する / 手動で発行して環境変数に置く など | サービスの管理画面で発行し、環境変数に置く |
+| 失敗したとき | `401` を返す | `400` / `401` を返し、処理しない |
+
+- 画面のログイン用の Cookie には頼らない（外部から呼ばれる API は Cookie を持たないため）
+- 認証は、ユースケースに渡す `AuthService` の実装を API 用に差し替えて行う / Route Handler の最初でチェックする
+- API キーは画面やログに出さない。保存する場合はハッシュにする
+
+### Webhook の注意点
+
+| 項目 | ルール |
+| ---- | ------ |
+| 署名の検証 | 受け取った本文を**加工する前**のまま検証する（`await request.text()` で受け取る） |
+| 二重の通知 | 同じ通知が複数回届くことがある。イベント ID を記録し、処理済みなら何もしない |
+| 返すまでの時間 | 重い処理は後回しにし、すぐに `200` を返す（遅いと送信元が失敗とみなして再送する） |
+
+## 5. バージョン
+
+| 項目 | ルール |
+| ---- | ------ |
+| 付け方 | パスに付ける（`/api/v1/...`） |
+| 互換性のある変更 | 同じバージョンのまま行ってよい（レスポンスへの項目の追加、任意のパラメータの追加） |
+| 互換性のない変更 | 新しいバージョン（`/api/v2/...`）を作る（項目の削除・名前の変更、型の変更、必須パラメータの追加） |
+| 古いバージョンの終了 | 利用者への告知から ◯ か月後に終了する |
+
+## 6. リクエスト・レスポンスの形
+
+| 項目 | ルール |
+| ---- | ------ |
+| 形式 | JSON |
+| 項目名 | camelCase / snake_case |
+| 日時 | ISO 8601（UTC）。例: `2026-01-01T00:00:00Z` |
+| 入力のチェック | Zod で行う（[05 フォーム・バリデーション](./05_フォーム・バリデーション.md) のスキーマを使い回してよい） |
+| 返す項目 | 外部向けの型を別に作る。画面用の DTO をそのまま返さない（画面の都合で API が変わるのを防ぐ） |
+| 一覧 | ページ分けする（`?limit=20&cursor=...` / `?page=1`）。上限を決める |
+
+### 成功したとき
+
+```json
+{
+  "data": { "id": "123", "title": "タイトル" }
+}
+```
+
+### 失敗したとき
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "入力内容を確認してください",
+    "details": { "title": ["タイトルを入力してください"] }
+  }
+}
+```
+
+### ステータスコード
+
+| ステータス | 使う場面 | `code` の例 |
+| ---------- | -------- | ----------- |
+| `200` / `201` | 成功 / 作成した | - |
+| `400` | リクエストの形式が正しくない、入力エラー | `VALIDATION_ERROR` |
+| `401` | 認証情報がない、正しくない | `UNAUTHORIZED` |
+| `403` | 認証はできたが、権限がない | `FORBIDDEN` |
+| `404` | 対象が見つからない | `NOT_FOUND` |
+| `409` / `422` | 業務のルール違反（重複登録など） | `CONFLICT` など |
+| `429` | 回数の上限を超えた | `RATE_LIMITED` |
+| `500` | 想定外のエラー | `INTERNAL_ERROR` |
+
+- `500` のときは、内部の情報（スタックトレース、SQL）を返さない（[06 エラー処理](./06_エラー処理.md)）
+
+## 7. 大量アクセス対策
+
+| 項目 | ルール |
+| ---- | ------ |
+| レート制限 | API キーごとに ◯ 回 / 分 まで。超えたら `429` と `Retry-After` ヘッダーを返す |
+| 実装 | ホスティングの機能を使う / Redis などで数える |
+| リクエストの大きさ | 本文の上限を決める（例: 1MB） |
+
+## 8. CORS
+
+| 項目 | ルール |
+| ---- | ------ |
+| ブラウザからの呼び出し | 許可しない（サーバーやアプリからだけ呼ぶ） / 許可する |
+| 許可する場合 | 許可するオリジンを列挙する。`*` は使わない |
+
+## 9. 実装の例
+
+```ts
+// src/app/api/v1/posts/route.ts
+import { container } from "@/infrastructure/di/container";
+import { ListPublishedPostsUseCase } from "@/application/usecase/post/list-published-posts.usecase";
+import { verifyApiKey } from "@/infrastructure/api/verify-api-key";
+import { toPublicPost } from "./public-post";
+import { errorResponse } from "@/app/api/v1/_lib/error-response";
+
+export async function GET(request: Request) {
+  // 1. 認証
+  const client = await verifyApiKey(request.headers.get("authorization"));
+  if (!client) {
+    return errorResponse(401, "UNAUTHORIZED", "API キーが正しくありません");
+  }
+
+  // 2. 画面と同じユースケースを呼ぶ
+  try {
+    const useCase = new ListPublishedPostsUseCase(container.postRepository());
+    const posts = await useCase.execute();
+
+    // 3. 外部向けの形に変換して返す
+    return Response.json({ data: posts.map(toPublicPost) });
+  } catch (error) {
+    console.error(error);
+    return errorResponse(500, "INTERNAL_ERROR", "エラーが発生しました");
+  }
+}
+```
+
+## 10. 変更履歴
+
+| 日付 | 変更内容 | 変更者 |
+| ---- | -------- | ------ |
+| YYYY-MM-DD | 新規作成 | |

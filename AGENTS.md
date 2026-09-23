@@ -7,3 +7,50 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+# プロジェクトのルール
+
+<!-- 上の nextjs-agent-rules のブロックは next dev が書き直すので、プロジェクトのルールはこの見出しより下に書く -->
+
+設計とルールの資料は `docs/` にある（入口は `docs/README.md`）。コードを書く前に、関係する資料を読み、資料と食い違うコードを書かない。資料と違うやり方が必要なら、先にユーザーに確認する。ルールを決めた理由は `docs/04_設計判断/`（ADR）にある。方針を変える提案をするときは、該当する ADR の「検討した案」と「見直す条件」を読んでから行う。
+
+## 特に守ること
+
+### アーキテクチャ（`docs/01_全体設計/06_アーキテクチャ.md`）
+
+- 層は `src/domain/`（業務のルール）→ `src/application/`（ユースケース、DTO）→ `src/infrastructure/`（DB・認証の実装、DI コンテナ）に分ける。依存は外側から内側への一方向だけ
+- ドメイン層は Next.js、React、DB クライアント、Zod を import しない
+- ユースケースは依存をコンストラクタで受け取る。ユースケースの中で DI コンテナを使ったり、実装を `new` したりしない
+- 依存の組み立て（Composition Root）は入口（Server Component / Server Action / Route Handler）で行う
+- Client Component にはエンティティではなく DTO（プレーンなオブジェクト）を渡す
+- `src/application/` と `src/infrastructure/` のファイルの先頭には `import "server-only"` を書く
+
+### データの取得・更新（`docs/02_共通設計/04_データ取得・更新.md`）
+
+- 画面の取得は Server Component、更新は Server Action で行う。画面から `fetch('/api/...')` で自前の API を呼ばない
+- Route Handler は外部公開 API（`src/app/api/v1/`）、Webhook（`src/app/api/webhooks/`）、画面用の例外（`src/app/api/internal/`）だけに使う（`docs/02_共通設計/09_外部公開API.md`）
+- Server Action の戻り値は `ActionResult` の形にそろえる。想定内のエラーは戻り値で返し、想定外のものだけ `throw` する
+
+### ファイルの置き場所と名前（`docs/01_全体設計/05_ディレクトリ構成.md`）
+
+- ファイル名・フォルダ名はすべて kebab-case（コンポーネントも `post-list.tsx`）。コンポーネント名は PascalCase
+- 複数の画面で使う部品は `src/components/{atoms,molecules,organisms}/{名前}/index.tsx`、その画面だけで使う部品は `src/app/**/_components/{名前}.tsx`
+- shadcn/ui の部品は `pnpm shadcn:add <atoms|molecules> <名前>` で追加する。`pnpm shadcn add` を直接使わない
+- テストはテスト対象と同じフォルダに `*.test.ts(x)` で置く
+
+### React・Next.js（`docs/02_共通設計/08_コーディング規約.md`）
+
+- `'use client'` は必要な最小の部品にだけ付ける
+- React Compiler が有効なので、`useMemo` / `useCallback` / `memo` は原則書かない
+- `middleware.ts` ではなく `proxy.ts` を使う
+
+## 作業を終える前に
+
+変更したら、次がすべて通ることを確認する（CI と同じ）。
+
+```bash
+pnpm lint && pnpm lint:ls && pnpm typecheck && pnpm test:coverage && pnpm build
+```
+
+- 業務のルールやユースケースを追加・変更したら、テストも書く（`docs/02_共通設計/10_テスト.md`）
+- ルールや構成を変えたら、関係する `docs/` の資料も更新する

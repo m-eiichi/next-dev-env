@@ -1,0 +1,28 @@
+# ファイル名・フォルダ名のルール（docs/01_全体設計/05_ディレクトリ構成.md の「4. ファイル名のルール」）
+# ファイル名はすべて kebab-case。コンポーネントも kebab-case（post-list.tsx）にする
+# 下の階層の設定は上の階層の設定を丸ごと置き換えるため、app ブロックにもすべての拡張子を書いている
+# 拡張子を追加したら（例: .schema.ts）、両方のブロックに追加する
+
+ls:
+  src:
+    .dir: kebab-case
+    .ts: kebab-case
+    .tsx: kebab-case
+    .d.ts: kebab-case
+    .test.ts: kebab-case
+    .test.tsx: kebab-case
+    .usecase.ts: kebab-case
+    .usecase.test.ts: kebab-case
+    .dto.ts: kebab-case
+
+    # App Router のフォルダは [id] / [...slug] / [[...slug]] / (group) / _private / @slot も許可する
+    app:
+      .dir: kebab-case | regex:\[[a-zA-Z0-9]+\] | regex:\[\.\.\.[a-zA-Z0-9]+\] | regex:\[\[\.\.\.[a-zA-Z0-9]+\]\] | regex:\([a-z0-9-]+\) | regex:_[a-z0-9-]+ | regex:@[a-z0-9-]+
+      .ts: kebab-case
+      .tsx: kebab-case
+      .d.ts: kebab-case
+      .test.ts: kebab-case
+      .test.tsx: kebab-case
+      .usecase.ts: kebab-case
+      .usecase.test.ts: kebab-case
+      .dto.ts: kebab-case
