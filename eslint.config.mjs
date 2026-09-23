@@ -36,6 +36,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // pnpm test:coverage が出力するレポート
+    "coverage/**",
   ]),
 ]);
 
