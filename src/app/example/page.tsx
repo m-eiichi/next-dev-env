@@ -20,9 +20,17 @@ export default async function Page() {
         </p>
       </section>
       <ExampleList examples={examples} />
-      <Link href="/" className="text-sm font-medium text-primary underline-offset-4 hover:underline">
-        ← トップへ戻る
-      </Link>
+      <div className="flex flex-wrap gap-x-6 gap-y-2">
+        <Link href="/" className="text-sm font-medium text-primary underline-offset-4 hover:underline">
+          ← トップへ戻る
+        </Link>
+        <Link
+          href="/example/search"
+          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+        >
+          検索のサンプル（TanStack Query）を見る →
+        </Link>
+      </div>
     </div>
   );
 }

@@ -22,6 +22,22 @@ describe("ListExamplesUseCase", () => {
     ]);
   });
 
+  it("検索語の前後の空白を取り除いてリポジトリに渡す", async () => {
+    const repository = { list: vi.fn(async () => []) };
+
+    await new ListExamplesUseCase(repository).execute({ keyword: "  query  " });
+
+    expect(repository.list).toHaveBeenCalledWith({ keyword: "query" });
+  });
+
+  it("検索語が空白だけなら条件なし（全件）で取得する", async () => {
+    const repository = { list: vi.fn(async () => []) };
+
+    await new ListExamplesUseCase(repository).execute({ keyword: "   " });
+
+    expect(repository.list).toHaveBeenCalledWith({ keyword: undefined });
+  });
+
   it("0 件なら空の配列を返す", async () => {
     const result = await new ListExamplesUseCase({ list: vi.fn(async () => []) }).execute();
 
