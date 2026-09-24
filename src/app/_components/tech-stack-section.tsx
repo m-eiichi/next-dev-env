@@ -1,3 +1,11 @@
+import {
+  Card,
+  CardAction,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/molecules/card";
+
 // 内容は docs/01_全体設計/02_システム構成.md の「1. 技術スタック」に合わせる
 const TECH_STACK = [
   { name: "Next.js", version: "16", usage: "App Router、Server Components / Server Actions" },
@@ -19,12 +27,16 @@ export function TechStackSection() {
       </h2>
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {TECH_STACK.map((tech) => (
-          <li key={tech.name} className="rounded-lg border border-border p-4">
-            <p className="flex items-baseline justify-between gap-2">
-              <span className="font-medium">{tech.name}</span>
-              <span className="font-mono text-sm text-muted-foreground">{tech.version}</span>
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">{tech.usage}</p>
+          <li key={tech.name}>
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle>{tech.name}</CardTitle>
+                <CardAction className="font-mono text-sm text-muted-foreground">
+                  {tech.version}
+                </CardAction>
+                <CardDescription>{tech.usage}</CardDescription>
+              </CardHeader>
+            </Card>
           </li>
         ))}
       </ul>

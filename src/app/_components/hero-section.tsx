@@ -1,4 +1,6 @@
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { buttonVariants } from "@/components/atoms/button";
 
 export function HeroSection() {
   return (
@@ -11,11 +13,10 @@ export function HeroSection() {
         のプロジェクトテンプレートです。画面の取得は Server Component、更新は
         Server Action で行い、業務のルールはドメイン層に集めます。
       </p>
-      <Link
-        href="/example"
-        className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-      >
-        サンプル一覧を見る →
+      {/* 画面の移動なので <a>（Link）のまま、見た目だけ button にする */}
+      <Link href="/example" className={buttonVariants({ size: "lg", className: "self-start" })}>
+        サンプル一覧を見る
+        <ArrowRight data-icon="inline-end" aria-hidden="true" />
       </Link>
     </section>
   );

@@ -1,3 +1,5 @@
+import { Card, CardContent } from "@/components/molecules/card";
+
 // 内容は docs/01_全体設計/06_アーキテクチャ.md の「2. 層の構成」に合わせる
 const LAYERS = [
   {
@@ -38,13 +40,17 @@ export function ArchitectureSection() {
       </p>
       <ol className="flex flex-col gap-3">
         {LAYERS.map((layer) => (
-          <li
-            key={layer.path}
-            className="flex flex-col gap-1 rounded-lg border border-border p-4 sm:flex-row sm:items-baseline sm:gap-4"
-          >
-            <span className="font-medium sm:w-56 sm:shrink-0">{layer.name}</span>
-            <code className="font-mono text-sm text-primary sm:w-60 sm:shrink-0">{layer.path}</code>
-            <span className="text-sm text-muted-foreground">{layer.role}</span>
+          <li key={layer.path}>
+            <Card>
+              {/* SCR-001 の「2.1 レスポンシブ」: モバイルは縦、sm 以上は横 1 行 */}
+              <CardContent className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4">
+                <span className="font-medium sm:w-56 sm:shrink-0">{layer.name}</span>
+                <code className="font-mono text-sm text-primary sm:w-60 sm:shrink-0">
+                  {layer.path}
+                </code>
+                <span className="text-sm text-muted-foreground">{layer.role}</span>
+              </CardContent>
+            </Card>
           </li>
         ))}
       </ol>
