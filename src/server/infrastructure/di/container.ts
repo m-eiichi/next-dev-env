@@ -1,6 +1,8 @@
 import "server-only";
 import type { ExampleRepository } from "@/server/domain/example/repository";
+import type { TechStackRepository } from "@/server/domain/tech-stack/repository";
 import { InMemoryExampleRepository } from "@/server/infrastructure/in-memory/example/in-memory-example-repository";
+import { InMemoryTechStackRepository } from "@/server/infrastructure/in-memory/tech-stack/in-memory-tech-stack-repository";
 
 /**
  * インターフェースと実装を結びつける。
@@ -9,4 +11,5 @@ import { InMemoryExampleRepository } from "@/server/infrastructure/in-memory/exa
  */
 export const container = {
   exampleRepository: (): ExampleRepository => new InMemoryExampleRepository(),
+  techStackRepository: (): TechStackRepository => new InMemoryTechStackRepository(),
 };

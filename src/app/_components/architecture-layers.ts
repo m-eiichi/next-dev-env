@@ -231,6 +231,7 @@ export async function listExamples(): Promise<ExampleDto[]> {
         file: "src/server/infrastructure/di/container.ts",
         code: `export const container = {
   exampleRepository: (): ExampleRepository => new InMemoryExampleRepository(),
+  techStackRepository: (): TechStackRepository => new InMemoryTechStackRepository(),
 };`,
         points: [
           "インターフェースと実装を結びつけるのはここだけ。差し替えるときも、ここを 1 行直せばよい",
