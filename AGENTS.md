@@ -43,6 +43,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ### React・Next.js（`docs/02_共通設計/08_コーディング規約.md`）
 
 - `'use client'` は必要な最小の部品にだけ付ける
+- ファイル直下の関数（コンポーネントを含む）は `function` で書く。`export const Foo = () => ...` にしない。関数の中のイベントハンドラーやコールバックはアロー関数でよい
 - React Compiler が有効なので、`useMemo` / `useCallback` / `memo` は原則書かない
 - `middleware.ts` ではなく `proxy.ts` を使う
 

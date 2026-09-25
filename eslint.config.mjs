@@ -33,6 +33,23 @@ function restrictImports(files, patterns) {
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  // ファイル直下の関数は function で書く。関数の中のアロー関数はよい
+  // （docs/02_共通設計/08_コーディング規約.md の「2.1」、docs/04_設計判断/ADR-011_関数の書き方.md）
+  {
+    rules: {
+      // 関数式（const f = function () {}）を禁止する。アロー関数はここでは許し、下で場所を絞る
+      "func-style": ["error", "declaration", { allowArrowFunctions: true }],
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            ":matches(Program, Program > ExportNamedDeclaration) > VariableDeclaration > VariableDeclarator > :matches(ArrowFunctionExpression, FunctionExpression)",
+          message:
+            "ファイル直下の関数は function で書きます（08 コーディング規約の「2.1」）。例: export function Foo() {}",
+        },
+      ],
+    },
+  },
   // フロントが src/server/ から import してよいのは、src/server/entry/ の関数と DTO の型だけ
   // （docs/04_設計判断/ADR-008_フロントとバックの分け方.md）
   restrictImports(
