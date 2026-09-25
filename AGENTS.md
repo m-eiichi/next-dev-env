@@ -30,6 +30,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - 画面の取得は Server Component から `src/server/entry/queries/` の関数を呼んで行い、更新は `src/server/entry/actions/` の Server Action で行う。画面から `fetch('/api/...')` で自前の API を呼ばない
 - Server Action は `src/app/` の中に置かない（1 画面だけで使うものも `src/server/entry/actions/` に置く）
+- Cache Components が有効。キャッシュは取得の関数に `'use cache'` と `cacheLife`（必須）・`cacheTag` で指定し、キャッシュしない取得は `<Suspense>` で囲む。`revalidate`・`dynamic`・`dynamicParams` のページ設定は使わない（`docs/04_設計判断/ADR-012_キャッシュの方式.md`）
 - Route Handler は外部公開 API（`src/app/api/v1/`）、Webhook（`src/app/api/webhooks/`）、画面用の例外（`src/app/api/internal/`）だけに使う（`docs/02_共通設計/09_外部公開API.md`）
 - Server Action の戻り値は `ActionResult` の形にそろえる。想定内のエラーは戻り値で返し、想定外のものだけ `throw` する
 
