@@ -140,3 +140,10 @@
     @apply font-sans;
   }
 }
+/* 印刷は A4 の用紙いっぱいに出す（ドキュメントエディタ。docs/03_画面設計/SCR-041_ドキュメントエディタ.md の「6」） */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+}

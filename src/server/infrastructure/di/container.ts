@@ -4,8 +4,10 @@ import type { NoteQueryService } from "@/server/application/query/note/note-quer
 import type { GettingStartedStepQueryService } from "@/server/application/query/getting-started/getting-started-step-query-service";
 import type { TechStackQueryService } from "@/server/application/query/tech-stack/tech-stack-query-service";
 import type { TodoQueryService } from "@/server/application/query/todo/todo-query-service";
+import type { ReportQueryService } from "@/server/application/query/report/report-query-service";
 import type { NoteRepository } from "@/server/domain/note/repository";
 import type { TodoRepository } from "@/server/domain/todo/repository";
+import type { ReportRepository } from "@/server/domain/report/repository";
 import { InMemoryArchitectureLayerQueryService } from "@/server/infrastructure/in-memory/architecture-layer/in-memory-architecture-layer-query-service";
 import { InMemoryNoteQueryService } from "@/server/infrastructure/in-memory/note/in-memory-note-query-service";
 import { InMemoryNoteRepository } from "@/server/infrastructure/in-memory/note/in-memory-note-repository";
@@ -13,6 +15,8 @@ import { InMemoryGettingStartedStepQueryService } from "@/server/infrastructure/
 import { InMemoryTechStackQueryService } from "@/server/infrastructure/in-memory/tech-stack/in-memory-tech-stack-query-service";
 import { InMemoryTodoQueryService } from "@/server/infrastructure/in-memory/todo/in-memory-todo-query-service";
 import { InMemoryTodoRepository } from "@/server/infrastructure/in-memory/todo/in-memory-todo-repository";
+import { InMemoryReportQueryService } from "@/server/infrastructure/in-memory/report/in-memory-report-query-service";
+import { InMemoryReportRepository } from "@/server/infrastructure/in-memory/report/in-memory-report-repository";
 
 /**
  * インターフェースと実装を結びつける。
@@ -30,4 +34,6 @@ export const container = {
   techStackQueryService: (): TechStackQueryService => new InMemoryTechStackQueryService(),
   todoQueryService: (): TodoQueryService => new InMemoryTodoQueryService(),
   todoRepository: (): TodoRepository => new InMemoryTodoRepository(),
+  reportQueryService: (): ReportQueryService => new InMemoryReportQueryService(),
+  reportRepository: (): ReportRepository => new InMemoryReportRepository(),
 };

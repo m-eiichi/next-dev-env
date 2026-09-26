@@ -23,6 +23,10 @@ export function HeroSection() {
           実装の見本（TODO）を見る
           <ArrowRight data-icon="inline-end" aria-hidden="true" />
         </Link>
+        <Link href="/reports" className={buttonVariants({ size: "lg", variant: "outline" })}>
+          実装の見本（ドキュメントエディタ）を見る
+          <ArrowRight data-icon="inline-end" aria-hidden="true" />
+        </Link>
       </div>
     </section>
   );
