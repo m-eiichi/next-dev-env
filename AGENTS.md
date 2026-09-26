@@ -48,6 +48,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - React Compiler が有効なので、`useMemo` / `useCallback` / `memo` は原則書かない
 - `middleware.ts` ではなく `proxy.ts` を使う
 
+## Claude Code の設定（`.claude/`）
+
+- 新しい画面や、画面に出すデータを追加するときは、skill `add-feature`（`.claude/skills/add-feature/SKILL.md`）の手順に沿う
+- ファイルを編集するたびに、hook が `src/` の `.ts` / `.tsx` に ESLint をかける。エラーを伝えられたら、その場で直す
+
 ## 作業を終える前に
 
 変更したら、次がすべて通ることを確認する（CI と同じ）。
