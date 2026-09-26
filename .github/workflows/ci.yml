@@ -49,19 +49,6 @@ jobs:
       - name: ビルド
         run: pnpm build
 
-  knip:
-    name: 未使用コードの検出（参考）
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    # 導入したライブラリをまだ使っていない段階では失敗するため、結果は参考にとどめる。
-    # コードがそろってきたら continue-on-error を外し、必須にする
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm knip
+      # わざと置いているもの（まだ使っていない部品・依存）は knip.json で外し、指摘 0 件を保つ（ADR-017）
+      - name: 未使用コードの検出
+        run: pnpm knip

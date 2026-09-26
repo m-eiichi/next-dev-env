@@ -46,10 +46,10 @@ grep -rln "TODO\|/todos\|todo/\|Todo" src docs .claude
 - [ ] CI と同じチェックを流す（層の説明のテストが、コード例のずれを見つける）
 
 ```bash
-pnpm lint && pnpm lint:ls && pnpm typecheck && pnpm test:coverage && pnpm build
+pnpm lint && pnpm lint:ls && pnpm typecheck && pnpm test:coverage && pnpm build && pnpm knip
 ```
 
 - [ ] skill `app-check` で、残した画面（トップ、層の説明など）が開けること、消した画面の URL が 404 になること（`/notes=404` のように渡す）を確かめる
-- [ ] `pnpm knip` で、消した結果使われなくなった export や依存がないかを見る（依存を消すときは、先にユーザーに確かめる）
+- [ ] knip が失敗したら（見本だけが使っていた部品や依存が、使われなくなったときなど）、`docs/02_共通設計/11_CI.md` の「3.3」の「knip が失敗したとき」に従う。消すか `knip.json` で外すかは、ユーザーに確かめる
 - [ ] カバレッジが 80% を下回ったら、数字合わせのテストは書かず、ユーザーに伝える（`docs/02_共通設計/10_テスト.md` の「7」）
 - [ ] ユーザーへの報告に、消したもの、差し替えたもの、そのままにしたもの（ADR など）を書く

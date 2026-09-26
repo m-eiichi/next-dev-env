@@ -51,8 +51,9 @@ description: 新しい画面、または画面に出すデータ（取得・更�
 - [ ] CI と同じチェックを流す
 
 ```bash
-pnpm lint && pnpm lint:ls && pnpm typecheck && pnpm test:coverage && pnpm build
+pnpm lint && pnpm lint:ls && pnpm typecheck && pnpm test:coverage && pnpm build && pnpm knip
 ```
 
-- [ ] skill `app-check` で、ビルドの結果（○ / ◐ / ƒ）が意図どおりかを見て、アプリを起動して各画面（`[id]` はない ID の 404 も）を開き、`pnpm knip` で今回のファイルに使っていない export がないかを見る
+- [ ] knip が失敗したら、`docs/02_共通設計/11_CI.md` の「3.3」の「knip が失敗したとき」に従う（見本の部品や依存を使い始めたときは、`knip.json` から外す）
+- [ ] skill `app-check` で、ビルドの結果（○ / ◐ / ƒ）が意図どおりかを見て、アプリを起動して各画面（`[id]` はない ID の 404 も）を開く
 - [ ] ユーザーへの報告に、更新した資料と、確かめていないこと（ブラウザでの見た目など）を書く

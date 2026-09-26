@@ -1,4 +1,21 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "ignore": [".claude/**", "src/lib/utils.ts"]
+  "ignoreFiles": [
+    ".claude/**",
+    "src/lib/utils.ts",
+    "src/components/atoms/badge/index.tsx",
+    "src/components/atoms/spinner/index.tsx",
+    "src/components/molecules/dialog/index.tsx"
+  ],
+  "ignoreDependencies": [
+    "@fortawesome/fontawesome-svg-core",
+    "@fortawesome/free-solid-svg-icons",
+    "@fortawesome/react-fontawesome",
+    "@hookform/resolvers",
+    "react-hook-form"
+  ],
+  "ignoreIssues": {
+    "src/components/molecules/card/index.tsx": ["exports"]
+  },
+  "treatConfigHintsAsErrors": true
 }

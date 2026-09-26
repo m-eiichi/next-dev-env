@@ -40,7 +40,7 @@ grep -rn "古い言葉" src docs .claude AGENTS.md CLAUDE.md README.md
 - [ ] CI と同じチェックを流す
 
 ```bash
-pnpm lint && pnpm lint:ls && pnpm typecheck && pnpm test:coverage && pnpm build
+pnpm lint && pnpm lint:ls && pnpm typecheck && pnpm test:coverage && pnpm build && pnpm knip
 ```
 
 - [ ] ユーザーへの報告に、変えた範囲、変えなかったもの（URL、コード上の名前、ADR）とその理由を書く
