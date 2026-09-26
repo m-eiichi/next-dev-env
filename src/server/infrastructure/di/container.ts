@@ -1,12 +1,12 @@
 import "server-only";
 import type { ArchitectureLayerQueryService } from "@/server/application/query/architecture-layer/architecture-layer-query-service";
-import type { ExampleQueryService } from "@/server/application/query/example/example-query-service";
+import type { NoteQueryService } from "@/server/application/query/note/note-query-service";
 import type { GettingStartedStepQueryService } from "@/server/application/query/getting-started/getting-started-step-query-service";
 import type { TechStackQueryService } from "@/server/application/query/tech-stack/tech-stack-query-service";
-import type { ExampleRepository } from "@/server/domain/example/repository";
+import type { NoteRepository } from "@/server/domain/note/repository";
 import { InMemoryArchitectureLayerQueryService } from "@/server/infrastructure/in-memory/architecture-layer/in-memory-architecture-layer-query-service";
-import { InMemoryExampleQueryService } from "@/server/infrastructure/in-memory/example/in-memory-example-query-service";
-import { InMemoryExampleRepository } from "@/server/infrastructure/in-memory/example/in-memory-example-repository";
+import { InMemoryNoteQueryService } from "@/server/infrastructure/in-memory/note/in-memory-note-query-service";
+import { InMemoryNoteRepository } from "@/server/infrastructure/in-memory/note/in-memory-note-repository";
 import { InMemoryGettingStartedStepQueryService } from "@/server/infrastructure/in-memory/getting-started/in-memory-getting-started-step-query-service";
 import { InMemoryTechStackQueryService } from "@/server/infrastructure/in-memory/tech-stack/in-memory-tech-stack-query-service";
 
@@ -19,8 +19,8 @@ import { InMemoryTechStackQueryService } from "@/server/infrastructure/in-memory
 export const container = {
   architectureLayerQueryService: (): ArchitectureLayerQueryService =>
     new InMemoryArchitectureLayerQueryService(),
-  exampleQueryService: (): ExampleQueryService => new InMemoryExampleQueryService(),
-  exampleRepository: (): ExampleRepository => new InMemoryExampleRepository(),
+  noteQueryService: (): NoteQueryService => new InMemoryNoteQueryService(),
+  noteRepository: (): NoteRepository => new InMemoryNoteRepository(),
   gettingStartedStepQueryService: (): GettingStartedStepQueryService =>
     new InMemoryGettingStartedStepQueryService(),
   techStackQueryService: (): TechStackQueryService => new InMemoryTechStackQueryService(),

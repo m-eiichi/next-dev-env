@@ -1,0 +1,38 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Suspense } from "react";
+import { listNotes } from "@/server/entry/queries/note/list-notes";
+import { NoteList } from "../_components/note-list";
+import { NoteSearch } from "./_components/note-search";
+
+export const metadata: Metadata = {
+  title: "メモ検索",
+};
+
+// 詳細設計: docs/03_画面設計/SCR-011_メモ検索.md
+export default async function Page() {
+  // 初期表示はサーバーで取得し、TanStack Query の initialData にする
+  const notes = await listNotes();
+
+  return (
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-12 sm:px-6 sm:py-16">
+      <section className="flex flex-col gap-4">
+        <h1 className="text-3xl font-semibold tracking-tight">メモ検索</h1>
+        <p className="max-w-2xl text-base leading-7 text-muted-foreground">
+          実装の見本です（アプリの機能ではありません）。メモを題材に、TanStack Query の使い方を見られます。最初の一覧はサーバーで取得し、入力した後はブラウザから /api/internal/notes を呼んで絞り込みます。
+        </p>
+      </section>
+      {/* TanStack Query は initialData を受け取るときに現在時刻を読むので、Suspense の内側に置く。
+          ビルド時に作る静的な枠には fallback（同じ一覧）が入る（docs/02_共通設計/04_データ取得・更新.md の「5.2」） */}
+      <Suspense fallback={<NoteList notes={notes} />}>
+        <NoteSearch initialNotes={notes} />
+      </Suspense>
+      <Link
+        href="/notes"
+        className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+      >
+        ← メモ一覧へ戻る
+      </Link>
+    </div>
+  );
+}

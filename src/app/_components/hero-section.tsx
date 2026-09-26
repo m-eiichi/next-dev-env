@@ -14,8 +14,8 @@ export function HeroSection() {
         Server Action で行い、業務のルールはドメイン層に集めます。
       </p>
       {/* 画面の移動なので <a>（Link）のまま、見た目だけ button にする */}
-      <Link href="/example" className={buttonVariants({ size: "lg", className: "self-start" })}>
-        サンプル一覧を見る
+      <Link href="/notes" className={buttonVariants({ size: "lg", className: "self-start" })}>
+        実装の見本（メモ）を見る
         <ArrowRight data-icon="inline-end" aria-hidden="true" />
       </Link>
     </section>

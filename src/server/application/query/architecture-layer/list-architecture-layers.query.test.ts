@@ -12,8 +12,8 @@ const LAYER: ArchitectureLayerDto = {
   does: ["業務のルールを書く"],
   doesNot: ["Next.js を使う"],
   cannotImport: ["ほかのすべての層"],
-  sampleFiles: [{ path: "src/server/domain/example/entity.ts", note: "エンティティ" }],
-  codeExamples: [{ file: "src/server/domain/example/entity.ts", code: "export class Example", points: ["ポイント"] }],
+  sampleFiles: [{ path: "src/server/domain/note/entity.ts", note: "エンティティ" }],
+  codeExamples: [{ file: "src/server/domain/note/entity.ts", code: "export class Note", points: ["ポイント"] }],
   docSection: "4.4 ドメイン層",
 };
 

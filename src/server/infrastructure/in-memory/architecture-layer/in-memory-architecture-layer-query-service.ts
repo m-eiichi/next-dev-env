@@ -23,28 +23,28 @@ const ARCHITECTURE_LAYERS: ArchitectureLayerDto[] = [
     ],
     cannotImport: ["src/server/ のうち、src/server/entry/ と DTO の型以外"],
     sampleFiles: [
-      { path: "src/app/example/page.tsx", note: "取得の関数を呼んで、結果を部品に渡すだけの page" },
-      { path: "src/app/example/_components/example-list.tsx", note: "DTO を受け取って表示するだけの部品" },
+      { path: "src/app/notes/page.tsx", note: "取得の関数を呼んで、結果を部品に渡すだけの page" },
+      { path: "src/app/notes/_components/note-list.tsx", note: "DTO を受け取って表示するだけの部品" },
       {
-        path: "src/app/example/search/_components/example-search.tsx",
+        path: "src/app/notes/search/_components/note-search.tsx",
         note: "TanStack Query で /api/internal/ を呼ぶ Client Component",
       },
     ],
     codeExamples: [
       {
-        file: "src/app/example/page.tsx",
+        file: "src/app/notes/page.tsx",
         code: `export default async function Page() {
-  const examples = await listExamples();`,
+  const notes = await listNotes();`,
         points: [
           "page.tsx は取得の関数（src/server/entry/queries/）を呼ぶだけ。DI コンテナやユースケースは出てこない",
           "受け取るのは DTO の配列なので、そのまま部品に渡せる",
         ],
       },
       {
-        file: "src/app/example/_components/example-list.tsx",
-        code: `import type { ExampleDto } from "@/server/application/dto/example/example.dto";
+        file: "src/app/notes/_components/note-list.tsx",
+        code: `import type { NoteDto } from "@/server/application/dto/note/note.dto";
 
-export function ExampleList({ examples }: { examples: ExampleDto[] }) {`,
+export function NoteList({ notes }: { notes: NoteDto[] }) {`,
         points: [
           "部品は DTO を props で受け取り、表示するだけ",
           "DTO は import type で読み込む。値として読み込むと ESLint のエラーになる",
@@ -67,23 +67,23 @@ export function ExampleList({ examples }: { examples: ExampleDto[] }) {`,
     doesNot: ["業務のルールを書く（ドメイン層に書く）", "DB に直接アクセスする"],
     cannotImport: ["フロント（src/app/、src/components/、src/hooks/）"],
     sampleFiles: [
-      { path: "src/server/entry/queries/example/list-examples.ts", note: "Server Component から呼ぶ取得の関数（クエリを呼ぶ。キャッシュ付き）" },
-      { path: "src/server/entry/actions/example/create-example.ts", note: "フォームから呼ぶ Server Action（ユースケースを呼ぶ）" },
-      { path: "src/server/entry/api/internal/examples.ts", note: "画面用の Route Handler の中身" },
+      { path: "src/server/entry/queries/note/list-notes.ts", note: "Server Component から呼ぶ取得の関数（クエリを呼ぶ。キャッシュ付き）" },
+      { path: "src/server/entry/actions/note/create-note.ts", note: "フォームから呼ぶ Server Action（ユースケースを呼ぶ）" },
+      { path: "src/server/entry/api/internal/notes.ts", note: "画面用の Route Handler の中身" },
       { path: "src/server/entry/api/problem-details.ts", note: "失敗したときのレスポンス（RFC 9457）" },
     ],
     codeExamples: [
       {
-        file: "src/server/entry/queries/example/list-examples.ts",
-        code: `export async function listExamples(): Promise<ExampleDto[]> {
+        file: "src/server/entry/queries/note/list-notes.ts",
+        code: `export async function listNotes(): Promise<NoteDto[]> {
   // データが変わるのは登録（SCR-012）のときだけなので、時間では作り直さず、登録のときにタグで捨てる
-  // （docs/03_画面設計/SCR-010_サンプル一覧.md の「7.1」、docs/02_共通設計/04_データ取得・更新.md の「2」）
+  // （docs/03_画面設計/SCR-010_メモ一覧.md の「7.1」、docs/02_共通設計/04_データ取得・更新.md の「2」）
   "use cache";
   cacheLife("max");
-  cacheTag("examples");
+  cacheTag("notes");
 
   // Composition Root: 依存を組み立ててクエリを作る
-  const query = new ListExamplesQuery(container.exampleQueryService());
+  const query = new ListNotesQuery(container.noteQueryService());
   return query.execute();
 }`,
         points: [
@@ -92,14 +92,14 @@ export function ExampleList({ examples }: { examples: ExampleDto[] }) {`,
         ],
       },
       {
-        file: "src/server/entry/actions/example/create-example.ts",
+        file: "src/server/entry/actions/note/create-note.ts",
         code: `  // 3. 一覧のキャッシュを捨てて、一覧へ移動する（redirect は try/catch の外で呼ぶ）
   // Server Action では revalidateTag ではなく updateTag（登録した人に古い一覧を見せない）
-  updateTag("examples");
-  redirect("/example");`,
+  updateTag("notes");
+  redirect("/notes");`,
         points: [
           "更新（command）。Server Action は入力を Zod でチェックし、ユースケースを呼ぶ",
-          "登録したら updateTag で一覧のキャッシュ（cacheTag(\"examples\")）を捨てる。次に一覧を開いたとき、新しいデータで作り直される",
+          "登録したら updateTag で一覧のキャッシュ（cacheTag(\"notes\")）を捨てる。次に一覧を開いたとき、新しいデータで作り直される",
         ],
       },
     ],
@@ -123,48 +123,48 @@ export function ExampleList({ examples }: { examples: ExampleDto[] }) {`,
     ],
     cannotImport: ["インフラストラクチャ層", "入口", "フロント", "command から query、query から command"],
     sampleFiles: [
-      { path: "src/server/application/command/example/create-example.usecase.ts", note: "リポジトリをコンストラクタで受け取るユースケース（更新）" },
-      { path: "src/server/application/query/example/list-examples.query.ts", note: "Query Service をコンストラクタで受け取るクエリ（読み取り）" },
-      { path: "src/server/application/query/example/example-query-service.ts", note: "Query Service のインターフェース（DTO を返す）" },
-      { path: "src/server/application/dto/example/example.dto.ts", note: "画面に渡す DTO" },
+      { path: "src/server/application/command/note/create-note.usecase.ts", note: "リポジトリをコンストラクタで受け取るユースケース（更新）" },
+      { path: "src/server/application/query/note/list-notes.query.ts", note: "Query Service をコンストラクタで受け取るクエリ（読み取り）" },
+      { path: "src/server/application/query/note/note-query-service.ts", note: "Query Service のインターフェース（DTO を返す）" },
+      { path: "src/server/application/dto/note/note.dto.ts", note: "画面に渡す DTO" },
     ],
     codeExamples: [
       {
-        file: "src/server/application/query/example/list-examples.query.ts",
-        code: `export class ListExamplesQuery {
-  constructor(private readonly exampleQueryService: ExampleQueryService) {}
+        file: "src/server/application/query/note/list-notes.query.ts",
+        code: `export class ListNotesQuery {
+  constructor(private readonly noteQueryService: NoteQueryService) {}
 
-  async execute(input: ListExamplesInput = {}): Promise<ExampleDto[]> {
+  async execute(input: ListNotesInput = {}): Promise<NoteDto[]> {
     // 前後の空白は無視し、空なら条件なし（全件）にする
     const keyword = input.keyword?.trim() || undefined;
-    return this.exampleQueryService.list({ keyword });
+    return this.noteQueryService.list({ keyword });
   }
 }`,
         points: [
-          "読み取り（query）。Query Service はコンストラクタで受け取る。型はインターフェース（ExampleQueryService）で、実装は知らない",
+          "読み取り（query）。Query Service はコンストラクタで受け取る。型はインターフェース（NoteQueryService）で、実装は知らない",
           "読み取りはドメイン層を通らず、Query Service から DTO をそのまま受け取る",
-          "テストではモックを渡すだけで、DB なしで動かせる（list-examples.query.test.ts）",
+          "テストではモックを渡すだけで、DB なしで動かせる（list-notes.query.test.ts）",
         ],
       },
       {
-        file: "src/server/application/command/example/create-example.usecase.ts",
-        code: `  async execute(input: CreateExampleInput): Promise<ExampleDto> {
-    // 1. エンティティを作る（タイトル・説明のルールのチェックはエンティティの中で行う）
-    const example = Example.create(input);
+        file: "src/server/application/command/note/create-note.usecase.ts",
+        code: `  async execute(input: CreateNoteInput): Promise<NoteDto> {
+    // 1. エンティティを作る（タイトル・本文のルールのチェックはエンティティの中で行う）
+    const note = Note.create(input);
 
     // 2. 同じタイトルがあれば登録しない（リポジトリで確かめる業務のルール）
-    if (await this.exampleRepository.existsByTitle(example.title)) {
-      throw new DuplicateExampleTitleError();
+    if (await this.noteRepository.existsByTitle(note.title)) {
+      throw new DuplicateNoteTitleError();
     }
 
     // 3. 保存して、DTO で返す
-    await this.exampleRepository.save(example);
-    return toExampleDto(example);
+    await this.noteRepository.save(note);
+    return toNoteDto(note);
   }`,
         points: [
           "更新（command）。エンティティとリポジトリ（ドメイン層のインターフェース）を使い、業務のルールを守る",
           "文字数のルールはエンティティ・値オブジェクトに、重複の確認のようにデータを見るルールはユースケースに書く",
-          "テストでは、重複があるときに保存しないことも確かめる（create-example.usecase.test.ts）",
+          "テストでは、重複があるときに保存しないことも確かめる（create-note.usecase.test.ts）",
         ],
       },
     ],
@@ -187,18 +187,18 @@ export function ExampleList({ examples }: { examples: ExampleDto[] }) {`,
     ],
     cannotImport: ["Next.js、React、Zod", "ほかのすべての層", "フロント"],
     sampleFiles: [
-      { path: "src/server/domain/example/entity.ts", note: "エンティティ" },
-      { path: "src/server/domain/example/value-objects/example-title.ts", note: "値オブジェクト（タイトルは 1〜100 文字）" },
-      { path: "src/server/domain/example/repository.ts", note: "リポジトリのインターフェース（更新に要るものだけ）" },
+      { path: "src/server/domain/note/entity.ts", note: "エンティティ" },
+      { path: "src/server/domain/note/value-objects/note-title.ts", note: "値オブジェクト（タイトルは 1〜100 文字）" },
+      { path: "src/server/domain/note/repository.ts", note: "リポジトリのインターフェース（更新に要るものだけ）" },
       { path: "src/server/domain/shared/domain-error.ts", note: "業務エラーの基底クラス" },
     ],
     codeExamples: [
       {
-        file: "src/server/domain/example/value-objects/example-title.ts",
-        code: `export class ExampleTitle {
+        file: "src/server/domain/note/value-objects/note-title.ts",
+        code: `export class NoteTitle {
   private constructor(readonly value: string) {}
 
-  static of(value: string): ExampleTitle {
+  static of(value: string): NoteTitle {
     const trimmed = value.trim();
     if (trimmed.length === 0) {
       throw new DomainError("タイトルは必須です");
@@ -206,11 +206,11 @@ export function ExampleList({ examples }: { examples: ExampleDto[] }) {`,
     if (trimmed.length > MAX_LENGTH) {
       throw new DomainError(\`タイトルは \${MAX_LENGTH} 文字以内にしてください\`);
     }
-    return new ExampleTitle(trimmed);
+    return new NoteTitle(trimmed);
   }
 }`,
         points: [
-          "値オブジェクトは、作るとき（of）にルールをチェックする。ルールに合わない値の ExampleTitle は存在できない",
+          "値オブジェクトは、作るとき（of）にルールをチェックする。ルールに合わない値の NoteTitle は存在できない",
           "ルール違反は DomainError で表す",
           "Next.js も React も Zod も使っていない、ただの TypeScript のクラス",
         ],
@@ -233,26 +233,26 @@ export function ExampleList({ examples }: { examples: ExampleDto[] }) {`,
     cannotImport: ["ユースケース・クエリ", "入口", "フロント（DTO と Query Service のインターフェースは import してよい）"],
     sampleFiles: [
       {
-        path: "src/server/infrastructure/in-memory/example/in-memory-example-query-service.ts",
+        path: "src/server/infrastructure/in-memory/note/in-memory-note-query-service.ts",
         note: "DB が決まるまでの、メモリ上の仮の Query Service（読み取り）",
       },
       {
-        path: "src/server/infrastructure/in-memory/example/in-memory-example-repository.ts",
+        path: "src/server/infrastructure/in-memory/note/in-memory-note-repository.ts",
         note: "DB が決まるまでの、メモリ上の仮のリポジトリ（更新）",
       },
       {
-        path: "src/server/infrastructure/in-memory/example/in-memory-example-store.ts",
+        path: "src/server/infrastructure/in-memory/note/in-memory-note-store.ts",
         note: "メモリ上の仮のデータ（読み取りと更新で共有する）",
       },
       { path: "src/server/infrastructure/di/container.ts", note: "DI コンテナ（呼ぶたびに新しいインスタンスを返す）" },
     ],
     codeExamples: [
       {
-        file: "src/server/infrastructure/in-memory/example/in-memory-example-query-service.ts",
-        code: `export class InMemoryExampleQueryService implements ExampleQueryService {
-  async list(filter: ExampleFilter = {}): Promise<ExampleDto[]> {`,
+        file: "src/server/infrastructure/in-memory/note/in-memory-note-query-service.ts",
+        code: `export class InMemoryNoteQueryService implements NoteQueryService {
+  async list(filter: NoteFilter = {}): Promise<NoteDto[]> {`,
         points: [
-          "アプリケーション層のインターフェース（ExampleQueryService）を implements する",
+          "アプリケーション層のインターフェース（NoteQueryService）を implements する",
           "読み取りなので、エンティティを作らずに DTO を直接返す",
           "DB が決まったら、同じインターフェースを実装したクラスを作って差し替える",
         ],
@@ -260,7 +260,7 @@ export function ExampleList({ examples }: { examples: ExampleDto[] }) {`,
       {
         file: "src/server/infrastructure/di/container.ts",
         // 足しても変わらない 1 行だけを載せる（全体を載せると、足すたびにここも直す必要がある）
-        code: `exampleQueryService: (): ExampleQueryService => new InMemoryExampleQueryService(),`,
+        code: `noteQueryService: (): NoteQueryService => new InMemoryNoteQueryService(),`,
         points: [
           "インターフェースと実装を結びつけるのはここだけ。差し替えるときも、ここを 1 行直せばよい",
           "呼ぶたびに新しいインスタンスを返す。使い回すと、ユーザーごとの情報が別のユーザーに漏れるおそれがあるため",

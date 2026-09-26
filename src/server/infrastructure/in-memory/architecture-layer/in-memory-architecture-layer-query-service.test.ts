@@ -3,13 +3,13 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { InMemoryArchitectureLayerQueryService } from "./in-memory-architecture-layer-query-service";
 
-// 説明ページ（SCR-020）に載せたファイルやコードが、実際のサンプルとずれていないかを確かめる
+// 説明ページ（SCR-020）に載せたファイルやコードが、実際のメモとずれていないかを確かめる
 describe("InMemoryArchitectureLayerQueryService", async () => {
   const layers = await new InMemoryArchitectureLayerQueryService().list();
   const readSource = (file: string) => readFileSync(resolve(process.cwd(), file), "utf-8");
 
   it.each(layers.flatMap((layer) => layer.sampleFiles))(
-    "サンプルのファイル $path が存在する",
+    "メモのファイル $path が存在する",
     ({ path }) => {
       expect(existsSync(resolve(process.cwd(), path))).toBe(true);
     },
