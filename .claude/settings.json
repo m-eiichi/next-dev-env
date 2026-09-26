@@ -13,7 +13,11 @@
       "Bash(pnpm test *)",
       "Bash(pnpm test:coverage)",
       "Bash(pnpm build)",
-      "Bash(pnpm knip)"
+      "Bash(pnpm knip)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)"
     ],
     "ask": [
       "Edit(.claude/settings.json)",

@@ -12,4 +12,5 @@
 - 実装の見本（メモ・TODO など）を消すときは、skill `remove-sample`（`.claude/skills/remove-sample/SKILL.md`）の手順に沿う
 - 画面を作った・変えた後に動くかを確かめるときは、skill `app-check`（`.claude/skills/app-check/SKILL.md`）の手順に沿う
 - 画面に出す言葉（画面名、用語）を変えるときは、skill `rename-term`（`.claude/skills/rename-term/SKILL.md`）の手順に沿う
+- コミットを頼まれたときは、skill `commit`（`.claude/skills/commit/SKILL.md`）の手順に沿う
 - ファイルを編集するたびに、hook が `src/` の `.ts` / `.tsx` に ESLint をかける。エラーを伝えられたら、その場で直す
