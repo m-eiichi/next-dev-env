@@ -219,14 +219,8 @@ export async function listExamples(): Promise<ExampleDto[]> {
       },
       {
         file: "src/server/infrastructure/di/container.ts",
-        code: `export const container = {
-  architectureLayerRepository: (): ArchitectureLayerRepository =>
-    new InMemoryArchitectureLayerRepository(),
-  exampleRepository: (): ExampleRepository => new InMemoryExampleRepository(),
-  gettingStartedStepRepository: (): GettingStartedStepRepository =>
-    new InMemoryGettingStartedStepRepository(),
-  techStackRepository: (): TechStackRepository => new InMemoryTechStackRepository(),
-};`,
+        // リポジトリを足しても変わらない 1 行だけを載せる（全体を載せると、足すたびにここも直す必要がある）
+        code: `exampleRepository: (): ExampleRepository => new InMemoryExampleRepository(),`,
         points: [
           "インターフェースと実装を結びつけるのはここだけ。差し替えるときも、ここを 1 行直せばよい",
           "呼ぶたびに新しいインスタンスを返す。使い回すと、ユーザーごとの情報が別のユーザーに漏れるおそれがあるため",

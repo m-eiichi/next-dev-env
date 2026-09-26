@@ -5,6 +5,7 @@ export type TechStackItemDto = {
   name: string;
   version: string;
   usage: string;
+  url: string;
 };
 
 export function toTechStackItemDto(item: TechStackItem): TechStackItemDto {
@@ -12,5 +13,6 @@ export function toTechStackItemDto(item: TechStackItem): TechStackItemDto {
     name: item.name,
     version: item.version,
     usage: item.usage,
+    url: item.url,
   };
 }

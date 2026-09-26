@@ -6,13 +6,13 @@ import { ListTechStackUseCase } from "./list-tech-stack.usecase";
 describe("ListTechStackUseCase", () => {
   it("リポジトリの一覧を DTO に変換して返す", async () => {
     const repository = {
-      list: vi.fn(async () => [{ name: "Next.js", version: "16", usage: "App Router" }]),
+      list: vi.fn(async () => [{ name: "Next.js", version: "16", usage: "App Router", url: "https://nextjs.org" }]),
     };
 
     const result = await new ListTechStackUseCase(repository).execute();
 
     expect(repository.list).toHaveBeenCalledOnce();
-    expect(result).toEqual([{ name: "Next.js", version: "16", usage: "App Router" }]);
+    expect(result).toEqual([{ name: "Next.js", version: "16", usage: "App Router", url: "https://nextjs.org" }]);
   });
 
   it("0 件なら空の配列を返す", async () => {

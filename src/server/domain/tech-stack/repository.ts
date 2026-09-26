@@ -4,6 +4,8 @@ export type TechStackItem = {
   name: string;
   version: string;
   usage: string;
+  // 公式サイトの URL
+  url: string;
 };
 
 export interface TechStackRepository {
