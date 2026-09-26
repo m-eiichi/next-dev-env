@@ -1,9 +1,9 @@
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/molecules/card";
-import { ARCHITECTURE_LAYERS } from "./architecture-layers";
+import type { ArchitectureLayerDto } from "@/server/application/dto/architecture-layer/architecture-layer.dto";
 
-export function ArchitectureSection() {
+export function ArchitectureSection({ layers }: { layers: ArchitectureLayerDto[] }) {
   return (
     <section aria-labelledby="architecture-heading" className="flex flex-col gap-4">
       <h2 id="architecture-heading" className="text-xl font-semibold">
@@ -13,7 +13,7 @@ export function ArchitectureSection() {
         依存は外側から内側への一方向だけにします。ドメイン層はどの層にも依存しません。各層を押すと、説明を見られます。
       </p>
       <ol className="flex flex-col gap-3">
-        {ARCHITECTURE_LAYERS.map((layer) => (
+        {layers.map((layer) => (
           <li key={layer.slug}>
             {/* カード全体を、層の説明（SCR-020）へのリンクにする */}
             <Link

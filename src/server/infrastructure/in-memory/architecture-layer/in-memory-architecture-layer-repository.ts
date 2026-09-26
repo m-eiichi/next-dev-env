@@ -1,23 +1,13 @@
+import "server-only";
+import type {
+  ArchitectureLayer,
+  ArchitectureLayerRepository,
+} from "@/server/domain/architecture-layer/repository";
+
 // 各層の情報。トップ（SCR-001）の「アーキテクチャ」と、層の説明（SCR-020）で使う
 // 内容は docs/01_全体設計/06_アーキテクチャ.md に合わせる。資料を変えたら、ここも直す
-
-export type ArchitectureLayer = {
-  slug: string;
-  name: string;
-  path: string;
-  role: string;
-  does: string[];
-  doesNot: string[];
-  cannotImport: string[];
-  sampleFiles: { path: string; note: string }[];
-  // サンプルのファイルから抜き出したコード。code は file の中身の一部とそのまま一致させる
-  // （architecture-layers.test.ts で、実際のファイルに含まれているかを確かめる）
-  codeExamples: { file: string; code: string; points: string[] }[];
-  // 06 アーキテクチャの中で、詳しく説明している節
-  docSection: string;
-};
-
-export const ARCHITECTURE_LAYERS: ArchitectureLayer[] = [
+// codeExamples が実際のファイルとずれていないかは、in-memory-architecture-layer-repository.test.ts で確かめる
+const ARCHITECTURE_LAYERS: ArchitectureLayer[] = [
   {
     slug: "presentation",
     name: "プレゼンテーション層（フロント）",
@@ -230,7 +220,11 @@ export async function listExamples(): Promise<ExampleDto[]> {
       {
         file: "src/server/infrastructure/di/container.ts",
         code: `export const container = {
+  architectureLayerRepository: (): ArchitectureLayerRepository =>
+    new InMemoryArchitectureLayerRepository(),
   exampleRepository: (): ExampleRepository => new InMemoryExampleRepository(),
+  gettingStartedStepRepository: (): GettingStartedStepRepository =>
+    new InMemoryGettingStartedStepRepository(),
   techStackRepository: (): TechStackRepository => new InMemoryTechStackRepository(),
 };`,
         points: [
@@ -243,6 +237,8 @@ export async function listExamples(): Promise<ExampleDto[]> {
   },
 ];
 
-export function findArchitectureLayer(slug: string): ArchitectureLayer | undefined {
-  return ARCHITECTURE_LAYERS.find((layer) => layer.slug === slug);
+export class InMemoryArchitectureLayerRepository implements ArchitectureLayerRepository {
+  async list(): Promise<ArchitectureLayer[]> {
+    return ARCHITECTURE_LAYERS;
+  }
 }

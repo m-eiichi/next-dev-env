@@ -2,31 +2,35 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/molecules/card";
-import { ARCHITECTURE_LAYERS, findArchitectureLayer } from "@/app/_components/architecture-layers";
+import { listArchitectureLayers } from "@/server/entry/queries/architecture-layer/list-architecture-layers";
 
 // 5 つの層をビルド時に静的に作る。それ以外の layer は notFound() で 404 にする
 // （dynamicParams は cacheComponents を有効にすると使えなくなるので使わない）
-export function generateStaticParams() {
-  return ARCHITECTURE_LAYERS.map((layer) => ({ layer: layer.slug }));
+export async function generateStaticParams() {
+  const layers = await listArchitectureLayers();
+  return layers.map((layer) => ({ layer: layer.slug }));
 }
 
 export async function generateMetadata({
   params,
 }: PageProps<"/architecture/[layer]">): Promise<Metadata> {
-  const layer = findArchitectureLayer((await params).layer);
+  const [{ layer: slug }, layers] = await Promise.all([params, listArchitectureLayers()]);
+  const layer = layers.find((item) => item.slug === slug);
   return layer ? { title: layer.name, description: layer.role } : {};
 }
 
 // 詳細設計: docs/03_画面設計/SCR-020_層の説明.md
 export default async function Page({ params }: PageProps<"/architecture/[layer]">) {
-  const layer = findArchitectureLayer((await params).layer);
-  if (!layer) {
+  const [{ layer: slug }, layers] = await Promise.all([params, listArchitectureLayers()]);
+
+  // 前・次の層も出すので、1 つだけを取る関数は作らず、一覧から選ぶ
+  const index = layers.findIndex((item) => item.slug === slug);
+  if (index === -1) {
     notFound();
   }
-
-  const index = ARCHITECTURE_LAYERS.indexOf(layer);
-  const previous = ARCHITECTURE_LAYERS[index - 1];
-  const next = ARCHITECTURE_LAYERS[index + 1];
+  const layer = layers[index];
+  const previous = layers[index - 1];
+  const next = layers[index + 1];
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-12 sm:px-6 sm:py-16">
