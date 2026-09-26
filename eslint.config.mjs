@@ -15,6 +15,11 @@ function forbidLayers(layers, message) {
   ];
 }
 
+const APPLICATION_MESSAGE =
+  "アプリケーション層からインフラストラクチャ層（実装や DI コンテナ）と入口は import しません。依存はコンストラクタで受け取ります（06 アーキテクチャ）。";
+const CQRS_MESSAGE =
+  "更新（command）と読み取り（query）は互いに import しません。共通で使うのは DTO とドメイン層だけです（06 アーキテクチャの「4.3」、ADR-016）。";
+
 // バックはフロントに依存しない
 const FORBID_FRONT = {
   group: ["@/app/**", "@/components/**", "@/hooks/**"],
@@ -82,26 +87,47 @@ const eslintConfig = defineConfig([
       FORBID_FRONT,
     ],
   ),
-  // アプリケーション層: ドメイン層のインターフェースだけに依存する
+  // アプリケーション層: ドメイン層とアプリケーション層のインターフェースだけに依存する
+  // 更新（command）と読み取り（query）は互いに import しない（CQRS。docs/04_設計判断/ADR-016_CQRS.md）
   restrictImports(
-    ["src/server/application/**/*.{ts,tsx}"],
+    ["src/server/application/command/**/*.{ts,tsx}"],
     [
-      ...forbidLayers(
-        ["infrastructure", "entry"],
-        "アプリケーション層からインフラストラクチャ層（実装や DI コンテナ）と入口は import しません。依存はコンストラクタで受け取ります（06 アーキテクチャ）。",
-      ),
+      ...forbidLayers(["infrastructure", "entry"], APPLICATION_MESSAGE),
+      ...forbidLayers(["application/query"], CQRS_MESSAGE),
+      { regex: "^\\.\\.?/(.*/)?query(/|$)", message: CQRS_MESSAGE },
       FORBID_FRONT,
     ],
   ),
-  // インフラストラクチャ層: ドメイン層のインターフェースを実装する
-  // DTO は import してよい（読むだけの機能では、リポジトリが DTO を直接返してよいため。06 アーキテクチャの「8」）
+  restrictImports(
+    ["src/server/application/query/**/*.{ts,tsx}"],
+    [
+      ...forbidLayers(["infrastructure", "entry"], APPLICATION_MESSAGE),
+      ...forbidLayers(["application/command"], CQRS_MESSAGE),
+      { regex: "^\\.\\.?/(.*/)?command(/|$)", message: CQRS_MESSAGE },
+      FORBID_FRONT,
+    ],
+  ),
+  // DTO: command と query の両方から使うので、どちらにも依存しない
+  restrictImports(
+    ["src/server/application/dto/**/*.{ts,tsx}"],
+    [
+      ...forbidLayers(["infrastructure", "entry", "application/command", "application/query"], APPLICATION_MESSAGE),
+      FORBID_FRONT,
+    ],
+  ),
+  // インフラストラクチャ層: ドメイン層のリポジトリと、アプリケーション層の Query Service のインターフェースを実装する
+  // DTO と Query Service のインターフェースは import してよい。ユースケース・クエリ（*.usecase / *.query）と入口は import しない
   restrictImports(
     ["src/server/infrastructure/**/*.{ts,tsx}"],
     [
       ...forbidLayers(
-        ["application/usecase", "entry"],
+        ["application/command", "entry"],
         "インフラストラクチャ層からユースケースと入口は import しません（06 アーキテクチャ）。",
       ),
+      {
+        regex: "^@/server/application/query/.+\\.query$",
+        message: "インフラストラクチャ層からクエリは import しません。import してよいのは Query Service のインターフェースと DTO だけです（06 アーキテクチャ）。",
+      },
       FORBID_FRONT,
     ],
   ),

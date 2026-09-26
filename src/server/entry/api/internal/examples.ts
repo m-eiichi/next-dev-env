@@ -1,7 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { container } from "@/server/infrastructure/di/container";
-import { ListExamplesUseCase } from "@/server/application/usecase/example/list-examples.usecase";
+import { ListExamplesQuery } from "@/server/application/query/example/list-examples.query";
 import type { ExampleDto } from "@/server/application/dto/example/example.dto";
 import { problemResponse } from "../problem-details";
 
@@ -28,8 +28,8 @@ export async function GET(request: Request): Promise<Response> {
 
   // 2. Composition Root と実行。想定外のエラーは 500 にし、内部の情報は返さない
   try {
-    const useCase = new ListExamplesUseCase(container.exampleRepository());
-    const examples = await useCase.execute({ keyword: parsed.data.q });
+    const query = new ListExamplesQuery(container.exampleQueryService());
+    const examples = await query.execute({ keyword: parsed.data.q });
     return Response.json({ data: examples } satisfies ListExamplesResponse);
   } catch (error) {
     console.error(error);

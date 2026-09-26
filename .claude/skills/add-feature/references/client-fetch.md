@@ -4,7 +4,7 @@
 
 ## チェック
 
-- [ ] 入口: `src/server/entry/api/internal/{名前}.ts` に Route Handler の中身を書く。入力を Zod でチェックし、ユースケースを呼ぶ
+- [ ] 入口: `src/server/entry/api/internal/{名前}.ts` に Route Handler の中身を書く。入力を Zod でチェックし、クエリを呼ぶ
 - [ ] レスポンスの型（`{ data: T }`）を入口のファイルで export し、返す値に `satisfies` を付ける
 - [ ] 失敗したときは `src/server/entry/api/problem-details.ts` の `problemResponse()` で返す（RFC 9457）
 - [ ] `src/app/api/internal/{名前}/route.ts` は `export { GET } from "@/server/entry/api/internal/{名前}"` の 1 行だけ

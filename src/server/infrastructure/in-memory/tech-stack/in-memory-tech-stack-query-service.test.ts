@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { InMemoryTechStackRepository } from "./in-memory-tech-stack-repository";
+import { InMemoryTechStackQueryService } from "./in-memory-tech-stack-query-service";
 
-describe("InMemoryTechStackRepository", async () => {
-  const items = await new InMemoryTechStackRepository().list();
+describe("InMemoryTechStackQueryService", async () => {
+  const items = await new InMemoryTechStackQueryService().list();
 
   it.each(items)("$name の公式サイトの URL が https で始まる", ({ url }) => {
     expect(url).toMatch(/^https:\/\//);

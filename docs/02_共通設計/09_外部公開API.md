@@ -12,7 +12,7 @@
 | ---- | ------ |
 | 画面の取得・更新 | 外部公開 API は使わない。Server Component / Server Action で行う（[04 データ取得・更新](./04_データ取得・更新.md)） |
 | 外部公開 API | 外部から呼ぶ必要がある操作だけを公開する |
-| 中身の処理 | 業務のルールを API 側に書かず、ユースケースを呼ぶ（[06 アーキテクチャ](../01_全体設計/06_アーキテクチャ.md)）。基本は画面と同じユースケースを使う。外部だけの取り方（公開済みのものだけ、など）や項目が要るときは、外部公開用のユースケースを分ける（画面用の DTO を広げない。[ADR-015](../04_設計判断/ADR-015_外部公開APIと画面用APIの線引き.md)） |
+| 中身の処理 | 業務のルールを API 側に書かず、読み取りはクエリ、更新はユースケースを呼ぶ（[06 アーキテクチャ](../01_全体設計/06_アーキテクチャ.md) の「4.3」）。基本は画面と同じものを使う。外部だけの取り方（公開済みのものだけ、など）や項目が要るときは、外部公開用のクエリを分ける（画面用の DTO を広げない。[ADR-015](../04_設計判断/ADR-015_外部公開APIと画面用APIの線引き.md)） |
 
 ### 画面から外部公開 API を呼ばない理由
 
@@ -52,7 +52,7 @@
 | 失敗したとき | `401` を返す | `400` / `401` を返し、処理しない |
 
 - 画面のログイン用の Cookie には頼らない（外部から呼ばれる API は Cookie を持たないため）
-- 認証は、ユースケースに渡す `AuthService` の実装を API 用に差し替えて行う / Route Handler の最初でチェックする
+- 認証は、クエリ・ユースケースに渡す `AuthService` の実装を API 用に差し替えて行う / Route Handler の最初でチェックする
 - API キーは画面やログに出さない。保存する場合はハッシュにする
 
 ### Webhook の注意点
@@ -92,10 +92,10 @@
 | 形式（書き方の約束） | JSON、成功は `{ data }`、失敗は RFC 9457（下の「失敗したとき」）、ステータスコードの使い方、項目名（camelCase）、日時（ISO 8601） | **そろえる** | ほとんど変わらない。そろえておけば、扱うコードを 1 種類で済ませられる |
 | 中身（何をどう返すか） | 返す項目、URL の設計、一覧のページ分け、バージョン、認証、互換性の約束 | **分ける** | 画面用は画面を直すたびに変えてよい。外部公開は利用者を壊さないように変える必要があり、約束の重さが違う |
 
-外部公開 API は、ユースケースが返す DTO を、入口で公開用の型に詰め替えて返す。
+外部公開 API は、クエリ（またはユースケース）が返す DTO を、入口で公開用の型に詰め替えて返す。
 
 ```
-ユースケース → DTO → toPublic〇〇()（src/server/entry/api/v1/）→ 公開用の型 → { data: [...] }
+クエリ → DTO → toPublic〇〇()（src/server/entry/api/v1/）→ 公開用の型 → { data: [...] }
 ```
 
 | 詰め替えでやること | 例 |
@@ -105,7 +105,7 @@
 | 形を、外部との約束どおりにする | 日時を ISO 8601 の文字列にする、値がないときは `null` にそろえる |
 
 - 画面側で DTO の項目を足す・名前を変えるときは、詰め替えの関数だけを直し、公開用の型は変えない。公開用の型を変えるのは、外部の利用者のために変える必要があるときだけ（互換性のない変更なら「5. バージョン」のとおり `/v2` を作る）
-- DTO に足りない項目や、外部だけの取り方が要るときは、画面用の DTO に足さず、外部公開用のユースケースを分ける（下の「9. 実装の例」の `ListPublishedPostsUseCase`）
+- DTO に足りない項目や、外部だけの取り方が要るときは、画面用の DTO に足さず、外部公開用のクエリを分ける（下の「9. 実装の例」の `ListPublishedPostsQuery`）
 
 ### 成功したとき
 
@@ -186,7 +186,7 @@ export { GET } from "@/server/entry/api/v1/posts";
 // src/server/entry/api/v1/posts.ts
 import "server-only";
 import { container } from "@/server/infrastructure/di/container";
-import { ListPublishedPostsUseCase } from "@/server/application/usecase/post/list-published-posts.usecase";
+import { ListPublishedPostsQuery } from "@/server/application/query/post/list-published-posts.query";
 import { verifyApiKey } from "@/server/infrastructure/api/verify-api-key";
 import { toPublicPost } from "./public-post";
 import { problemResponse } from "../problem-details";
@@ -198,10 +198,10 @@ export async function GET(request: Request) {
     return problemResponse({ status: 401, code: "UNAUTHORIZED", detail: "API キーが正しくありません" });
   }
 
-  // 2. ユースケースを呼ぶ（公開済みの投稿だけを返す、外部公開用のユースケース。「6.1」）
+  // 2. クエリを呼ぶ（公開済みの投稿だけを返す、外部公開用のクエリ。「6.1」）
   try {
-    const useCase = new ListPublishedPostsUseCase(container.postRepository());
-    const posts = await useCase.execute();
+    const query = new ListPublishedPostsQuery(container.postQueryService());
+    const posts = await query.execute();
 
     // 3. 外部向けの形に変換して返す
     return Response.json({ data: posts.map(toPublicPost) });
@@ -243,3 +243,4 @@ export function toPublicPost(post: PostDto): PublicPost {
 | 2026-09-23 | 外部向けの型の置き場所を追記（[ADR-009](../04_設計判断/ADR-009_APIのレスポンスの型.md)） | |
 | 2026-09-23 | 失敗したときの形を RFC 9457（Problem Details）に変更。`problemResponse()` を `src/server/entry/api/` に置き、画面用の Route Handler と共用にした（[ADR-010](../04_設計判断/ADR-010_APIのエラーの形.md)） | |
 | 2026-09-26 | 「1」の「中身の処理」を、外部公開用のユースケースを分ける場合がある形に直した。「6」の項目名を camelCase に決め、「6.1 画面用の API との関係」を追加（[ADR-015](../04_設計判断/ADR-015_外部公開APIと画面用APIの線引き.md)） | |
+| 2026-09-26 | 読み取りを「クエリ」、更新を「ユースケース」と呼び分けた（CQRS。[ADR-016](../04_設計判断/ADR-016_CQRS.md)） | |

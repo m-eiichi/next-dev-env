@@ -30,6 +30,12 @@ export default async function Page() {
         >
           検索のサンプル（TanStack Query）を見る →
         </Link>
+        <Link
+          href="/example/new"
+          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+        >
+          サンプルを登録する（Server Action）→
+        </Link>
       </div>
     </div>
   );

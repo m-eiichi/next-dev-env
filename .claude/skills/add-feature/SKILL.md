@@ -22,14 +22,14 @@ description: 新しい画面、または画面に出すデータ（取得・更�
 
 | 場合 | 読むもの |
 | ---- | -------- |
-| いつも | [references/backend.md](references/backend.md)（バック）、[references/frontend.md](references/frontend.md)（フロント） |
-| 更新（登録・変更・削除）がある | ＋ [references/mutation.md](references/mutation.md) |
+| いつも | [references/backend.md](references/backend.md)（バックの読み取り。query）、[references/frontend.md](references/frontend.md)（フロント） |
+| 更新（登録・変更・削除）がある | ＋ [references/mutation.md](references/mutation.md)（バックの更新。command） |
 | ブラウザ側で取り直す（TanStack Query） | ＋ [references/client-fetch.md](references/client-fetch.md) |
 
 ## 2. 流れ
 
 1. 資料を先に書く（下の「3」）
-2. バックを内側から作る: ドメイン層 → インフラストラクチャ層 → DI コンテナ → アプリケーション層 → 入口（`references/backend.md`）
+2. バックを内側から作る。読み取り（query）は `references/backend.md`、更新（command）は `references/mutation.md`（更新と読み取りの分け方は `docs/01_全体設計/06_アーキテクチャ.md` の「4.3」）
 3. フロントを作る（`references/frontend.md`）
 4. 仕上げ（下の「4」）
 

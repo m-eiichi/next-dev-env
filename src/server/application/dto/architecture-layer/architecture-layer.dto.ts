@@ -1,6 +1,4 @@
-import type { ArchitectureLayer } from "@/server/domain/architecture-layer/repository";
-
-// 画面に渡してよい項目だけを持つプレーンなオブジェクト
+// 画面に渡してよい項目だけを持つプレーンなオブジェクト（アーキテクチャの各層の説明）
 export type ArchitectureLayerDto = {
   slug: string;
   name: string;
@@ -10,25 +8,8 @@ export type ArchitectureLayerDto = {
   doesNot: string[];
   cannotImport: string[];
   sampleFiles: { path: string; note: string }[];
+  // サンプルのファイルから抜き出したコード。code は file の中身の一部とそのまま一致させる
   codeExamples: { file: string; code: string; points: string[] }[];
+  // 06 アーキテクチャの中で、詳しく説明している節
   docSection: string;
 };
-
-export function toArchitectureLayerDto(layer: ArchitectureLayer): ArchitectureLayerDto {
-  // 配列はコピーして渡し、画面側で書き換えてもリポジトリのデータに影響しないようにする
-  return {
-    slug: layer.slug,
-    name: layer.name,
-    path: layer.path,
-    role: layer.role,
-    does: [...layer.does],
-    doesNot: [...layer.doesNot],
-    cannotImport: [...layer.cannotImport],
-    sampleFiles: layer.sampleFiles.map((file) => ({ ...file })),
-    codeExamples: layer.codeExamples.map((example) => ({
-      ...example,
-      points: [...example.points],
-    })),
-    docSection: layer.docSection,
-  };
-}

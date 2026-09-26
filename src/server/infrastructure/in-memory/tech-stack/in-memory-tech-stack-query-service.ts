@@ -1,8 +1,9 @@
 import "server-only";
-import type { TechStackItem, TechStackRepository } from "@/server/domain/tech-stack/repository";
+import type { TechStackItemDto } from "@/server/application/dto/tech-stack/tech-stack.dto";
+import type { TechStackQueryService } from "@/server/application/query/tech-stack/tech-stack-query-service";
 
 // 内容は docs/01_全体設計/02_システム構成.md の「1. 技術スタック」に合わせる（1 行につき 1 つ）
-const TECH_STACK: TechStackItem[] = [
+const TECH_STACK: TechStackItemDto[] = [
   {
     name: "Next.js",
     version: "16",
@@ -25,8 +26,9 @@ const TECH_STACK: TechStackItem[] = [
   { name: "Vitest", version: "5", usage: "ドメイン層・ユースケースのテスト", url: "https://vitest.dev" },
 ];
 
-export class InMemoryTechStackRepository implements TechStackRepository {
-  async list(): Promise<TechStackItem[]> {
-    return TECH_STACK;
+export class InMemoryTechStackQueryService implements TechStackQueryService {
+  async list(): Promise<TechStackItemDto[]> {
+    // 定数を書き換えられないように、コピーを返す
+    return TECH_STACK.map((item) => ({ ...item }));
   }
 }

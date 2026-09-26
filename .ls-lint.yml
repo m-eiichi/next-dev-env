@@ -13,6 +13,8 @@ ls:
     .test.tsx: kebab-case
     .usecase.ts: kebab-case
     .usecase.test.ts: kebab-case
+    .query.ts: kebab-case
+    .query.test.ts: kebab-case
     .dto.ts: kebab-case
 
     # App Router のフォルダは [id] / [...slug] / [[...slug]] / (group) / _private / @slot も許可する
@@ -25,4 +27,6 @@ ls:
       .test.tsx: kebab-case
       .usecase.ts: kebab-case
       .usecase.test.ts: kebab-case
+      .query.ts: kebab-case
+      .query.test.ts: kebab-case
       .dto.ts: kebab-case
