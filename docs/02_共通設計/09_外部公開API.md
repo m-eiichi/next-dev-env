@@ -12,7 +12,7 @@
 | ---- | ------ |
 | 画面の取得・更新 | 外部公開 API は使わない。Server Component / Server Action で行う（[04 データ取得・更新](./04_データ取得・更新.md)） |
 | 外部公開 API | 外部から呼ぶ必要がある操作だけを公開する |
-| 中身の処理 | 画面と同じユースケースを呼ぶ。業務のルールを API 側に書かない（[06 アーキテクチャ](../01_全体設計/06_アーキテクチャ.md)） |
+| 中身の処理 | 業務のルールを API 側に書かず、ユースケースを呼ぶ（[06 アーキテクチャ](../01_全体設計/06_アーキテクチャ.md)）。基本は画面と同じユースケースを使う。外部だけの取り方（公開済みのものだけ、など）や項目が要るときは、外部公開用のユースケースを分ける（画面用の DTO を広げない。[ADR-015](../04_設計判断/ADR-015_外部公開APIと画面用APIの線引き.md)） |
 
 ### 画面から外部公開 API を呼ばない理由
 
@@ -77,11 +77,35 @@
 | 項目 | ルール |
 | ---- | ------ |
 | 形式 | JSON |
-| 項目名 | camelCase / snake_case |
+| 項目名 | camelCase（TypeScript のコード、DTO、画面用の API と同じ。[ADR-015](../04_設計判断/ADR-015_外部公開APIと画面用APIの線引き.md)） |
 | 日時 | ISO 8601（UTC）。例: `2026-01-01T00:00:00Z` |
 | 入力のチェック | Zod で行う（[05 フォーム・バリデーション](./05_フォーム・バリデーション.md) のスキーマを使い回してよい） |
-| 返す項目 | 外部向けの型を別に作る。画面用の DTO をそのまま返さない（画面の都合で API が変わるのを防ぐ。[ADR-009](../04_設計判断/ADR-009_APIのレスポンスの型.md)）。型と変換の関数は `src/server/entry/api/v1/` に置く（例: `public-post.ts` の `PublicPost` と `toPublicPost`） |
+| 返す項目 | 外部向けの型を別に作る。画面用の DTO をそのまま返さない（画面の都合で API が変わるのを防ぐ。[ADR-009](../04_設計判断/ADR-009_APIのレスポンスの型.md)）。型と変換の関数は `src/server/entry/api/v1/` に置く（例: `public-post.ts` の `PublicPost` と `toPublicPost`）。詳しくは下の「6.1」 |
 | 一覧 | ページ分けする（`?limit=20&cursor=...` / `?page=1`）。上限を決める |
+
+### 6.1 画面用の API との関係
+
+外部公開 API と画面用の API（`/api/internal/`、[04 データ取得・更新](./04_データ取得・更新.md) の「5」）は、**形式はそろえ、中身は分ける**（[ADR-015](../04_設計判断/ADR-015_外部公開APIと画面用APIの線引き.md)）。
+
+| 分類 | 例 | 外部公開と画面用 | 理由 |
+| ---- | -- | ---------------- | ---- |
+| 形式（書き方の約束） | JSON、成功は `{ data }`、失敗は RFC 9457（下の「失敗したとき」）、ステータスコードの使い方、項目名（camelCase）、日時（ISO 8601） | **そろえる** | ほとんど変わらない。そろえておけば、扱うコードを 1 種類で済ませられる |
+| 中身（何をどう返すか） | 返す項目、URL の設計、一覧のページ分け、バージョン、認証、互換性の約束 | **分ける** | 画面用は画面を直すたびに変えてよい。外部公開は利用者を壊さないように変える必要があり、約束の重さが違う |
+
+外部公開 API は、ユースケースが返す DTO を、入口で公開用の型に詰め替えて返す。
+
+```
+ユースケース → DTO → toPublic〇〇()（src/server/entry/api/v1/）→ 公開用の型 → { data: [...] }
+```
+
+| 詰め替えでやること | 例 |
+| ------------------ | -- |
+| 返す項目を選ぶ | 画面だけで使う項目（`isNew` など）や、内部だけの項目は出さない |
+| 名前を、外部との約束どおりにする | DTO の `description` を `summary` として返す |
+| 形を、外部との約束どおりにする | 日時を ISO 8601 の文字列にする、値がないときは `null` にそろえる |
+
+- 画面側で DTO の項目を足す・名前を変えるときは、詰め替えの関数だけを直し、公開用の型は変えない。公開用の型を変えるのは、外部の利用者のために変える必要があるときだけ（互換性のない変更なら「5. バージョン」のとおり `/v2` を作る）
+- DTO に足りない項目や、外部だけの取り方が要るときは、画面用の DTO に足さず、外部公開用のユースケースを分ける（下の「9. 実装の例」の `ListPublishedPostsUseCase`）
 
 ### 成功したとき
 
@@ -174,7 +198,7 @@ export async function GET(request: Request) {
     return problemResponse({ status: 401, code: "UNAUTHORIZED", detail: "API キーが正しくありません" });
   }
 
-  // 2. 画面と同じユースケースを呼ぶ
+  // 2. ユースケースを呼ぶ（公開済みの投稿だけを返す、外部公開用のユースケース。「6.1」）
   try {
     const useCase = new ListPublishedPostsUseCase(container.postRepository());
     const posts = await useCase.execute();
@@ -188,6 +212,28 @@ export async function GET(request: Request) {
 }
 ```
 
+```ts
+// src/server/entry/api/v1/public-post.ts（公開用の型と詰め替え。「6.1」）
+import type { PostDto } from "@/server/application/dto/post/post.dto";
+
+// 外部の利用者との約束。項目の削除・名前の変更は /v2 を作る（「5. バージョン」）
+export type PublicPost = {
+  id: string;
+  title: string;
+  summary: string;
+  publishedAt: string | null;
+};
+
+export function toPublicPost(post: PostDto): PublicPost {
+  return {
+    id: post.id,
+    title: post.title,
+    summary: post.body.slice(0, 200), // 画面用の DTO の項目名や形が変わっても、ここで吸収する
+    publishedAt: post.publishedAt,
+  };
+}
+```
+
 ## 10. 変更履歴
 
 | 日付 | 変更内容 | 変更者 |
@@ -196,3 +242,4 @@ export async function GET(request: Request) {
 | 2026-09-23 | 実装の例を、中身を `src/server/entry/api/` に置く形にした（[ADR-008](../04_設計判断/ADR-008_フロントとバックの分け方.md)） | |
 | 2026-09-23 | 外部向けの型の置き場所を追記（[ADR-009](../04_設計判断/ADR-009_APIのレスポンスの型.md)） | |
 | 2026-09-23 | 失敗したときの形を RFC 9457（Problem Details）に変更。`problemResponse()` を `src/server/entry/api/` に置き、画面用の Route Handler と共用にした（[ADR-010](../04_設計判断/ADR-010_APIのエラーの形.md)） | |
+| 2026-09-26 | 「1」の「中身の処理」を、外部公開用のユースケースを分ける場合がある形に直した。「6」の項目名を camelCase に決め、「6.1 画面用の API との関係」を追加（[ADR-015](../04_設計判断/ADR-015_外部公開APIと画面用APIの線引き.md)） | |
