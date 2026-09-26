@@ -3,12 +3,16 @@ import type { ArchitectureLayerQueryService } from "@/server/application/query/a
 import type { NoteQueryService } from "@/server/application/query/note/note-query-service";
 import type { GettingStartedStepQueryService } from "@/server/application/query/getting-started/getting-started-step-query-service";
 import type { TechStackQueryService } from "@/server/application/query/tech-stack/tech-stack-query-service";
+import type { TodoQueryService } from "@/server/application/query/todo/todo-query-service";
 import type { NoteRepository } from "@/server/domain/note/repository";
+import type { TodoRepository } from "@/server/domain/todo/repository";
 import { InMemoryArchitectureLayerQueryService } from "@/server/infrastructure/in-memory/architecture-layer/in-memory-architecture-layer-query-service";
 import { InMemoryNoteQueryService } from "@/server/infrastructure/in-memory/note/in-memory-note-query-service";
 import { InMemoryNoteRepository } from "@/server/infrastructure/in-memory/note/in-memory-note-repository";
 import { InMemoryGettingStartedStepQueryService } from "@/server/infrastructure/in-memory/getting-started/in-memory-getting-started-step-query-service";
 import { InMemoryTechStackQueryService } from "@/server/infrastructure/in-memory/tech-stack/in-memory-tech-stack-query-service";
+import { InMemoryTodoQueryService } from "@/server/infrastructure/in-memory/todo/in-memory-todo-query-service";
+import { InMemoryTodoRepository } from "@/server/infrastructure/in-memory/todo/in-memory-todo-repository";
 
 /**
  * インターフェースと実装を結びつける。
@@ -24,4 +28,6 @@ export const container = {
   gettingStartedStepQueryService: (): GettingStartedStepQueryService =>
     new InMemoryGettingStartedStepQueryService(),
   techStackQueryService: (): TechStackQueryService => new InMemoryTechStackQueryService(),
+  todoQueryService: (): TodoQueryService => new InMemoryTodoQueryService(),
+  todoRepository: (): TodoRepository => new InMemoryTodoRepository(),
 };

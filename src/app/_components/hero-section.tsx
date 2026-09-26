@@ -14,10 +14,16 @@ export function HeroSection() {
         Server Action で行い、業務のルールはドメイン層に集めます。
       </p>
       {/* 画面の移動なので <a>（Link）のまま、見た目だけ button にする */}
-      <Link href="/notes" className={buttonVariants({ size: "lg", className: "self-start" })}>
-        実装の見本（メモ）を見る
-        <ArrowRight data-icon="inline-end" aria-hidden="true" />
-      </Link>
+      <div className="flex flex-wrap gap-3">
+        <Link href="/notes" className={buttonVariants({ size: "lg" })}>
+          実装の見本（メモ）を見る
+          <ArrowRight data-icon="inline-end" aria-hidden="true" />
+        </Link>
+        <Link href="/todos" className={buttonVariants({ size: "lg", variant: "outline" })}>
+          実装の見本（TODO）を見る
+          <ArrowRight data-icon="inline-end" aria-hidden="true" />
+        </Link>
+      </div>
     </section>
   );
 }
