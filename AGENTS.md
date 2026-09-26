@@ -11,47 +11,41 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 # プロジェクトのルール
 
 <!-- 上の nextjs-agent-rules のブロックは next dev が書き直すので、プロジェクトのルールはこの見出しより下に書く -->
+<!-- このファイルは毎回読み込まれる入口。ルールの中身は書かず、機械では止められないことと、読む資料の目次だけを書く（docs/05_AI駆動開発/02_仕組み.md の「1.1」） -->
 
-設計とルールの資料は `docs/` にある（入口は `docs/README.md`）。コードを書く前に、関係する資料を読み、資料と食い違うコードを書かない。資料と違うやり方が必要なら、先にユーザーに確認する。ルールを決めた理由は `docs/04_設計判断/`（ADR）にある。方針を変える提案をするときは、該当する ADR の「検討した案」と「見直す条件」を読んでから行う。
+設計とルールの資料は `docs/` にある。作業を始める前に、下の「作業ごとに読むもの」から関係する資料の節を読み、資料と食い違うコードを書かない。資料と違うやり方が必要なら、先にユーザーに確認する。
 
-## 特に守ること
+## 毎回守ること
 
-### アーキテクチャ（`docs/01_全体設計/06_アーキテクチャ.md`）
+機械（ESLint・ls-lint・テスト）では止められないので、ここに書いている。
 
-- `src/server/` の外（`src/app/`、`src/components/`、`src/hooks/`）がフロント、中がバック。フロントが `src/server/` から import してよいのは `src/server/entry/` の関数と DTO の型だけ（`docs/04_設計判断/ADR-008_フロントとバックの分け方.md`）
-- バックは `src/server/entry/`（入口）→ `src/server/application/`（ユースケース、DTO）→ `src/server/domain/`（業務のルール）に分け、`src/server/infrastructure/`（DB・認証の実装、DI コンテナ）がドメイン層のインターフェースを実装する。依存は外側から内側への一方向だけ
-- ドメイン層は Next.js、React、DB クライアント、Zod を import しない
-- ユースケースは依存をコンストラクタで受け取る。ユースケースの中で DI コンテナを使ったり、実装を `new` したりしない
-- 依存の組み立て（Composition Root）は入口（`src/server/entry/`）だけで行う。`page.tsx` は取得の関数を呼んで部品に渡すだけ、`route.ts` は `src/server/entry/api/` から読み込むだけにする
-- Client Component にはエンティティではなく DTO（プレーンなオブジェクト）を渡す
-- `src/server/application/`、`src/server/infrastructure/`、`src/server/entry/queries/`、`src/server/entry/api/` のファイルの先頭には `import "server-only"` を書く（DTO と、`'use server'` を書く `src/server/entry/actions/` は除く）
-
-### データの取得・更新（`docs/02_共通設計/04_データ取得・更新.md`）
-
-- 画面の取得は Server Component から `src/server/entry/queries/` の関数を呼んで行い、更新は `src/server/entry/actions/` の Server Action で行う。画面から `fetch('/api/...')` で自前の API を呼ばない
-- Server Action は `src/app/` の中に置かない（1 画面だけで使うものも `src/server/entry/actions/` に置く）
-- Cache Components が有効。キャッシュは取得の関数に `'use cache'` と `cacheLife`（必須）・`cacheTag` で指定し、キャッシュしない取得は `<Suspense>` で囲む。`revalidate`・`dynamic`・`dynamicParams` のページ設定は使わない（`docs/04_設計判断/ADR-012_キャッシュの方式.md`）
-- Route Handler は外部公開 API（`src/app/api/v1/`）、Webhook（`src/app/api/webhooks/`）、画面用の例外（`src/app/api/internal/`）だけに使う（`docs/02_共通設計/09_外部公開API.md`）
-- Server Action の戻り値は `ActionResult` の形にそろえる。想定内のエラーは戻り値で返し、想定外のものだけ `throw` する
-
-### ファイルの置き場所と名前（`docs/01_全体設計/05_ディレクトリ構成.md`）
-
-- ファイル名・フォルダ名はすべて kebab-case（コンポーネントも `post-list.tsx`）。コンポーネント名は PascalCase
-- 複数の画面で使う部品は `src/components/{atoms,molecules,organisms}/{名前}/index.tsx`、その画面だけで使う部品は `src/app/**/_components/{名前}.tsx`
+- 画面の取得は Server Component から `src/server/entry/queries/` の関数を呼び、更新は `src/server/entry/actions/` の Server Action で行う。画面から `fetch("/api/...")` で自前の API を呼ばない
 - shadcn/ui の部品は `pnpm shadcn:add <atoms|molecules> <名前>` で追加する。`pnpm shadcn add` を直接使わない
-- テストはテスト対象と同じフォルダに `*.test.ts(x)` で置く
+- React Compiler が有効なので `useMemo` / `useCallback` / `memo` は原則書かない。`middleware.ts` ではなく `proxy.ts` を使う。`'use client'` は必要な最小の部品にだけ付ける
+- 頼まれていないコミット・push・Pull Request の作成、依存の追加・削除は、先に人に確認する（`docs/05_AI駆動開発/01_方針・進め方.md`）
 
-### React・Next.js（`docs/02_共通設計/08_コーディング規約.md`）
+層をまたぐ import、関数の書き方、ファイル名のルールは、ESLint・ls-lint が止める。エラーになったら、エラーの文に書かれた資料を読む。
 
-- `'use client'` は必要な最小の部品にだけ付ける
-- ファイル直下の関数（コンポーネントを含む）は `function` で書く。`export const Foo = () => ...` にしない。関数の中のイベントハンドラーやコールバックはアロー関数でよい
-- React Compiler が有効なので、`useMemo` / `useCallback` / `memo` は原則書かない
-- `middleware.ts` ではなく `proxy.ts` を使う
+## 作業ごとに読むもの
 
-## AI を使った開発の進め方（`docs/05_AI駆動開発/`）
-
-- 人と AI の役割分担、作業の流れ、AI に任せないことは `docs/05_AI駆動開発/01_方針・進め方.md` に従う
-- 頼まれていないコミット・push・Pull Request の作成、依存の追加・削除、資料と違うやり方は、先に人に確認する
+| 作業 | 読むもの |
+| ---- | -------- |
+| 画面を追加する | `docs/03_画面設計/README.md`、`docs/01_全体設計/01_サイトマップ・画面一覧.md` |
+| 処理をどの層に書くか、import で迷う | `docs/01_全体設計/06_アーキテクチャ.md` の「2. 層の構成」 |
+| 各層（入口・ユースケース・ドメイン・インフラ）の書き方 | `docs/01_全体設計/06_アーキテクチャ.md` の「4. 各層の責務と書き方」の該当する層 |
+| データを取得する、キャッシュを決める | `docs/02_共通設計/04_データ取得・更新.md` の「1」「2」 |
+| データを更新する（Server Action） | `docs/02_共通設計/04_データ取得・更新.md` の「3」、`docs/02_共通設計/05_フォーム・バリデーション.md` |
+| ブラウザで取り直す（TanStack Query） | `docs/02_共通設計/04_データ取得・更新.md` の「5」 |
+| Route Handler、外部公開 API | `docs/02_共通設計/04_データ取得・更新.md` の「4」、`docs/02_共通設計/09_外部公開API.md` |
+| エラーの扱い | `docs/02_共通設計/06_エラー処理.md` |
+| 認証・認可 | `docs/02_共通設計/01_認証・認可.md` の「3」「4」 |
+| ファイルの置き場所、名前、部品の分け方 | `docs/01_全体設計/05_ディレクトリ構成.md` の「2」「4」 |
+| 命名、関数の書き方、`cn()` | `docs/02_共通設計/08_コーディング規約.md` |
+| 見た目（色、余白、アイコン） | `docs/02_共通設計/03_デザインルール.md` |
+| テストを書く | `docs/02_共通設計/10_テスト.md` の「2」「3」 |
+| 方針を変える提案をする | `docs/04_設計判断/` の該当する ADR の「検討した案」と「見直す条件」 |
+| Next.js の API を使う | `node_modules/next/dist/docs/`（上の段落のとおり） |
+| AI としての進め方 | `docs/05_AI駆動開発/01_方針・進め方.md` |
 
 ## 作業を終える前に
 
@@ -61,5 +55,5 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 pnpm lint && pnpm lint:ls && pnpm typecheck && pnpm test:coverage && pnpm build
 ```
 
-- 業務のルールやユースケースを追加・変更したら、テストも書く（`docs/02_共通設計/10_テスト.md`）
-- ルールや構成を変えたら、関係する `docs/` の資料も更新する
+- 業務のルールやユースケースを追加・変更したら、テストも書く
+- ルールや構成を変えたら、関係する `docs/` の資料も更新する。`docs/` の節の番号や名前を変えたら、上の「作業ごとに読むもの」も直す
