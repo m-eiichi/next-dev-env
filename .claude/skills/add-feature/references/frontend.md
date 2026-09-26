@@ -11,3 +11,5 @@
 - [ ] 画面内の移動は `next/link`、外部サイトは `<a target="_blank" rel="noopener noreferrer">`
 - [ ] 動的なルート（`[id]` など）は `generateStaticParams` と `notFound()` で作る。`dynamicParams` は使わない（Cache Components が有効のため）
 - [ ] `metadata`（`title`）を書く
+- [ ] 画面の中の計算（ドラッグでの移動、はみ出しの補正、並べ替えなど）が大きいときは、部品から純粋な関数に分けて `_components/` の `.ts` に置き、同じフォルダでテストする（`docs/02_共通設計/10_テスト.md` の「2」）
+- [ ] 印刷する画面なら、印刷しない部分に `print:hidden` を付ける。共通のヘッダー・フッター（`src/components/organisms/`）にはまだ付いていないので、付けるならユーザーに確かめる（全画面の印刷に効くため）
