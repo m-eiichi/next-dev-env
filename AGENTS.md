@@ -48,10 +48,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - React Compiler が有効なので、`useMemo` / `useCallback` / `memo` は原則書かない
 - `middleware.ts` ではなく `proxy.ts` を使う
 
-## Claude Code の設定（`.claude/`）
+## AI を使った開発の進め方（`docs/05_AI駆動開発/`）
 
-- 新しい画面や、画面に出すデータを追加するときは、skill `add-feature`（`.claude/skills/add-feature/SKILL.md`）の手順に沿う
-- ファイルを編集するたびに、hook が `src/` の `.ts` / `.tsx` に ESLint をかける。エラーを伝えられたら、その場で直す
+- 人と AI の役割分担、作業の流れ、AI に任せないことは `docs/05_AI駆動開発/01_方針・進め方.md` に従う
+- 頼まれていないコミット・push・Pull Request の作成、依存の追加・削除、資料と違うやり方は、先に人に確認する
 
 ## 作業を終える前に
 
