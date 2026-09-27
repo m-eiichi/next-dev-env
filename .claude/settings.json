@@ -70,6 +70,11 @@
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/eslint-changed-file.mjs\"",
             "timeout": 60,
             "statusMessage": "ESLint で確認しています"
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/remind-ai-docs.mjs\"",
+            "timeout": 10
           }
         ]
       }
