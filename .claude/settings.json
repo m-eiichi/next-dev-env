@@ -8,13 +8,13 @@
       "Bash(git add * -f *)",
       "Bash(git add * --force *)",
       "Bash(git add * -f)",
-      "Bash(git add * --force)"
+      "Bash(git add * --force)",
+      "Edit(node_modules/**)"
     ],
     "allow": [
       "Edit(src/**)",
       "Edit(docs/**)",
       "Edit(public/**)",
-      "Edit(.claude/skills/**)",
       "Edit(README.md)",
       "Bash(npx eslint *)",
       "Bash(pnpm lint)",
@@ -30,8 +30,8 @@
       "Bash(git add *)"
     ],
     "ask": [
-      "Edit(.claude/settings.json)",
-      "Edit(.claude/hooks/**)",
+      "Edit(.claude/**)",
+      "Edit(.git/**)",
       "Edit(AGENTS.md)",
       "Edit(CLAUDE.md)",
       "Edit(docs/04_設計判断/**)",
@@ -49,6 +49,11 @@
       "Edit(.env*)",
       "Edit(.gitignore)",
       "Bash(rm *)",
+      "Bash(rmdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(sed -i *)",
+      "Bash(sed * -i *)",
       "Bash(git reset *)",
       "Bash(git clean *)",
       "Bash(git checkout *)",

@@ -66,4 +66,5 @@ grep -o 'skill `[a-z-]*`' CLAUDE.md
 pnpm lint && pnpm lint:ls && pnpm typecheck && pnpm test:coverage && pnpm build && pnpm knip
 ```
 
-- [ ] ユーザーへの報告に、直した資料と、skill・hook・権限の変更は次の会話から効くことを書く
+- [ ] ユーザーへの報告に、直した資料と、いつから効くかを書く（skill は次の会話から。権限は VS Code の「Developer: Reload Window」の後から。`02_仕組み.md` の「2.3」）
+- [ ] 権限を変えたら、Reload Window の後に「確かめて」と頼んでもらい、`deny` は止まるか、`ask` は確認が出るかを実際に試す（確認が出たかは Claude から見えないので、人に聞く）
