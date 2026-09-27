@@ -65,7 +65,7 @@ Node.js、pnpm、Claude Code はコンテナに入っているので、手元の
 Pull Request を出す前に、CI と同じチェックを手元で実行しておく。
 
 ```bash
-pnpm lint && pnpm lint:ls && pnpm typecheck && pnpm test:coverage && pnpm build
+pnpm lint && pnpm lint:ls && pnpm typecheck && pnpm test:coverage && pnpm build && pnpm knip
 ```
 
 ## 開発の流れ

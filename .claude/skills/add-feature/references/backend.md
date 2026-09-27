@@ -23,4 +23,4 @@
 - [ ] クエリで認証・認可をチェックしている。チェックしない場合（全員が見られる画面）は、理由をコメントで書く
 - [ ] クエリの中でエンティティを作っていない。業務のルールを書いていない
 - [ ] 取得の関数ごとに、`'use cache'`＋`cacheLife` を付けるか、画面側で `<Suspense>` で囲むかを決める（`docs/02_共通設計/04_データ取得・更新.md` の「2」）。メモリ上の仮の実装なら、どちらもなしでよい
-- [ ] DI コンテナを変えたら、層の説明ページのコード例（`in-memory-architecture-layer-repository.ts` の `codeExamples`）とずれていないか、テストで確かめる
+- [ ] DI コンテナを変えたら、層の説明ページのコード例（`in-memory-architecture-layer-query-service.ts` の `codeExamples`）とずれていないか、テストで確かめる

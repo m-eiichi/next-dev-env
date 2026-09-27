@@ -18,13 +18,17 @@ description: 新しい画面、または画面に出すデータ（取得・更�
 
 作りたいものに近い実装の見本（メモ・TODO）を `docs/03_画面設計/README.md` の「実装の見本」で探し、そのコードを真似する。
 
+見本ではない、本来の最初の画面を作るときは、見本を消すかをユーザーに確かめる。消すなら skill `remove-sample` を使う（この画面ができてからのほうが、見本の差し替え先ができて消しやすい）。
+
+新しい画面名や用語が、すでに別の意味で使っている言葉とぶつかるとき、または見本の画面を消さずに別の画面へ作り変えるときは、すでにある言葉を変えることになる。その部分は skill `rename-term` を使う。
+
 資料と違うやり方が必要なら、実装の前にユーザーに確認する。
 
 ## 1. 読む手順
 
 | 場合 | 読むもの |
 | ---- | -------- |
-| いつも | [references/backend.md](references/backend.md)（バックの読み取り。query）、[references/frontend.md](references/frontend.md)（フロント） |
+| いつも | [references/backend.md](references/backend.md)（バックの読み取り。query）、[references/frontend.md](references/frontend.md)（フロント）、[references/touch-points.md](references/touch-points.md)（コードのほかに直す場所） |
 | 更新（登録・変更・削除）がある | ＋ [references/mutation.md](references/mutation.md)（バックの更新。command） |
 | ブラウザ側で取り直す（TanStack Query） | ＋ [references/client-fetch.md](references/client-fetch.md) |
 
@@ -45,11 +49,13 @@ description: 新しい画面、または画面に出すデータ（取得・更�
 ## 4. 仕上げ
 
 - [ ] 新しいフォルダを作ったら `docs/01_全体設計/05_ディレクトリ構成.md` の「1. 全体」を更新する
+- [ ] [references/touch-points.md](references/touch-points.md) の場所（DI コンテナ、トップのボタン、見本の表など）で、直し忘れがないか確かめる
 - [ ] CI と同じチェックを流す
 
 ```bash
-pnpm lint && pnpm lint:ls && pnpm typecheck && pnpm test:coverage && pnpm build
+pnpm lint && pnpm lint:ls && pnpm typecheck && pnpm test:coverage && pnpm build && pnpm knip
 ```
 
-- [ ] ビルドの結果で、ページが意図どおり静的（○）か部分的に静的（◐）になっているかを見る
+- [ ] knip が失敗したら、`docs/02_共通設計/11_CI.md` の「3.3」の「knip が失敗したとき」に従う（見本の部品や依存を使い始めたときは、`knip.json` から外す）
+- [ ] skill `app-check` で、ビルドの結果（○ / ◐ / ƒ）が意図どおりかを見て、アプリを起動して各画面（`[id]` はない ID の 404 も）を開く
 - [ ] ユーザーへの報告に、更新した資料と、確かめていないこと（ブラウザでの見た目など）を書く

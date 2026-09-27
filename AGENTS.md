@@ -53,7 +53,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 変更したら、次がすべて通ることを確認する（CI と同じ）。
 
 ```bash
-pnpm lint && pnpm lint:ls && pnpm typecheck && pnpm test:coverage && pnpm build
+pnpm lint && pnpm lint:ls && pnpm typecheck && pnpm test:coverage && pnpm build && pnpm knip
 ```
 
 - 業務のルールやユースケースを追加・変更したら、テストも書く

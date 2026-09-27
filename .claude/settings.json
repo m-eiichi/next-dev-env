@@ -1,4 +1,65 @@
 {
+  "permissions": {
+    "allow": [
+      "Edit(src/**)",
+      "Edit(docs/**)",
+      "Edit(public/**)",
+      "Edit(.claude/skills/**)",
+      "Edit(README.md)",
+      "Bash(npx eslint *)",
+      "Bash(pnpm lint)",
+      "Bash(pnpm lint:ls)",
+      "Bash(pnpm typecheck)",
+      "Bash(pnpm test *)",
+      "Bash(pnpm test:coverage)",
+      "Bash(pnpm build)",
+      "Bash(pnpm knip)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)"
+    ],
+    "ask": [
+      "Edit(.claude/settings.json)",
+      "Edit(.claude/hooks/**)",
+      "Edit(AGENTS.md)",
+      "Edit(CLAUDE.md)",
+      "Edit(docs/04_設計判断/**)",
+      "Edit(.github/**)",
+      "Edit(.devcontainer/**)",
+      "Edit(scripts/**)",
+      "Edit(package.json)",
+      "Edit(pnpm-lock.yaml)",
+      "Edit(pnpm-workspace.yaml)",
+      "Edit(*.config.*)",
+      "Edit(knip.json)",
+      "Edit(.ls-lint.yml)",
+      "Edit(tsconfig.json)",
+      "Edit(components.json)",
+      "Edit(.env*)",
+      "Bash(rm *)",
+      "Bash(git reset *)",
+      "Bash(git clean *)",
+      "Bash(git checkout *)",
+      "Bash(git restore *)",
+      "Bash(git stash *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(npm install *)",
+      "Bash(npm uninstall *)",
+      "Bash(pnpm add *)",
+      "Bash(pnpm remove *)",
+      "Bash(pnpm update *)",
+      "Bash(gh *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "WebFetch",
+      "mcp__claude_ai_Claude_Docs",
+      "mcp__claude_ai_Gmail",
+      "mcp__claude_ai_Google_Calendar",
+      "mcp__claude_ai_Google_Drive"
+    ]
+  },
   "hooks": {
     "PostToolUse": [
       {
@@ -9,6 +70,11 @@
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/eslint-changed-file.mjs\"",
             "timeout": 60,
             "statusMessage": "ESLint で確認しています"
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/remind-ai-docs.mjs\"",
+            "timeout": 10
           }
         ]
       }
