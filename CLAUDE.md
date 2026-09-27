@@ -13,6 +13,6 @@
 - 画面を作った・変えた後に動くかを確かめるときは、skill `app-check`（`.claude/skills/app-check/SKILL.md`）の手順に沿う
 - 画面に出す言葉（画面名、用語）を変えるときは、skill `rename-term`（`.claude/skills/rename-term/SKILL.md`）の手順に沿う
 - `.claude/`（skill、hook、権限）・`AGENTS.md`・`CLAUDE.md` を変えたときは、skill `update-ai-docs`（`.claude/skills/update-ai-docs/SKILL.md`）の手順に沿って資料をそろえる
-- コミットを頼まれたときは、skill `commit`（`.claude/skills/commit/SKILL.md`）の手順に沿う
+- ファイルを変えた作業の報告（変えたもの、更新した資料、確かめていないこと）の最後に、「問題なければコミットしますか？」と尋ねる。OK をもらったとき、またはコミットを頼まれたときは、skill `commit`（`.claude/skills/commit/SKILL.md`）の手順に沿う。OK がなければコミットしない
 - ファイルを編集するたびに、hook が `src/` の `.ts` / `.tsx` に ESLint をかける。エラーを伝えられたら、その場で直す
 - `.claude/`・`AGENTS.md`・`CLAUDE.md` を編集すると、hook が資料をそろえるよう伝える。伝えられたら、作業を終える前に skill `update-ai-docs` に沿う
