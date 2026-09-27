@@ -1,5 +1,15 @@
 {
   "permissions": {
+    "deny": [
+      "Read(.env*)",
+      "Read(!.env.example)",
+      "Bash(git add -f *)",
+      "Bash(git add --force *)",
+      "Bash(git add * -f *)",
+      "Bash(git add * --force *)",
+      "Bash(git add * -f)",
+      "Bash(git add * --force)"
+    ],
     "allow": [
       "Edit(src/**)",
       "Edit(docs/**)",
@@ -37,6 +47,7 @@
       "Edit(tsconfig.json)",
       "Edit(components.json)",
       "Edit(.env*)",
+      "Edit(.gitignore)",
       "Bash(rm *)",
       "Bash(git reset *)",
       "Bash(git clean *)",
