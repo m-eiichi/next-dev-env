@@ -18,6 +18,11 @@
 
   "customizations": {
     "vscode": {
+      // Claude Code の最初のモードを「Edit automatically」に固定する（知らないうちに auto で始まらないように）
+      // 理由は docs/05_AI駆動開発/02_仕組み.md の「2.3」
+      "settings": {
+        "claudeCode.initialPermissionMode": "acceptEdits"
+      },
       "extensions": [
         "donjayamanne.githistory",
         "esbenp.prettier-vscode",
