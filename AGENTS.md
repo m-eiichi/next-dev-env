@@ -47,6 +47,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 | 方針を変える提案をする | `docs/04_設計判断/` の該当する ADR の「検討した案」と「見直す条件」 |
 | Next.js の API を使う | `node_modules/next/dist/docs/`（上の段落のとおり） |
 | AI としての進め方 | `docs/05_AI駆動開発/01_方針・進め方.md` |
+| 課題（GitHub Issues）を足す・分ける・取り組む、次にやることを答える | `docs/06_課題・ロードマップ/README.md`、`docs/06_課題・ロードマップ/01_ロードマップ.md` |
 
 ## 作業を終える前に
 
