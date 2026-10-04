@@ -3,6 +3,10 @@
     "deny": [
       "Read(.env*)",
       "Read(!.env.example)",
+      "Read(~/.config/gh/**)",
+      "Bash(gh auth token*)",
+      "Bash(gh auth status *-t*)",
+      "Bash(gh auth status *--show-token*)",
       "Bash(git add -f *)",
       "Bash(git add --force *)",
       "Bash(git add * -f *)",

@@ -13,6 +13,12 @@
   // vsコードユーザーで実行
   "remoteUser": "vscode",
 
+  // GitHub CLI（gh）。Issues を読み書きする（docs/06_課題・ロードマップ/README.md の「6」）
+  // ログイン情報はボリュームに残さない（コンテナを作り直したらログインし直す。トークンを Docker の中に残し続けないため）
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
   // Claude Codeのログイン情報を保持（コンテナを作り直しても再ログイン不要）
   "mounts": ["source=claude-config,target=/home/vscode/.claude,type=volume"],
 

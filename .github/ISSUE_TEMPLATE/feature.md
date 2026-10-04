@@ -1,10 +1,10 @@
 ---
 name: 新機能・改善
 about: 新しい機能、機能の変更、コードや仕組みの整理
-labels: feature
+labels: enhancement
 ---
 
-<!-- 書き方は docs/06_課題・ロードマップ/README.md。整理だけなら、ラベルを improvement に変える -->
+<!-- 書き方は docs/06_課題・ロードマップ/README.md。整理だけ（使う人から見て変わらない）なら、ラベルを enhancement から improvement に変える -->
 
 ## 背景・目的
 

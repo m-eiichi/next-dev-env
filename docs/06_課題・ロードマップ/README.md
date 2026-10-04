@@ -27,12 +27,14 @@
 
 | ラベル | 使うとき |
 | ------ | -------- |
-| `feature` | 新機能・機能の変更（使う人から見て変わるもの） |
+| `enhancement` | 新機能・機能の変更（使う人から見て変わるもの） |
 | `bug` | 不具合 |
 | `improvement` | コードや仕組みの整理（使う人から見て変わらないもの） |
-| `docs` | 資料だけ |
+| `documentation` | 資料だけ |
 | `priority:high` | 先にやるもの。付けなければ通常 |
 
+- `enhancement`・`bug`・`documentation` は GitHub に最初からあるラベル。`improvement`・`priority:high` は、このプロジェクトで足した
+- 最初からあるほかのラベル（`duplicate`、`wontfix`、`question` など）も、意味どおりに使ってよい
 - ラベルを足したら、この表にも足す
 
 ## 3. 大きな課題を分ける
@@ -68,9 +70,39 @@
 
 - AI は `gh`（GitHub CLI）で Issues を読む（`gh issue list`、`gh issue view 12`）。`gh` が使えないときは、人に Issue の内容を貼ってもらう
 - Issue の作成・編集・コメント・クローズは GitHub への書き込みなので、AI は中身を見せて人の OK をもらってから行う
+- `gh` のコマンドは、読むだけのものも含めて、実行のたびに確認が出る（[02 仕組み](../05_AI駆動開発/02_仕組み.md) の「2.3」）。AI はトークンを読めない
+
+### 6.1 `gh` にログインする
+
+`gh` は開発用コンテナに入っている（`.devcontainer/devcontainer.json` の `features`）。ログイン情報はコンテナの中にだけ置き、ボリュームに残さない。**コンテナを作り直したら、ログインし直す**（VS Code の開き直しや PC の再起動では要らない）。
+
+1. GitHub の Settings → Developer settings → Fine-grained personal access tokens で、トークンを作る
+   - Token name: `next-dev-env-devcontainer-issues`（どのリポジトリで、どこで、何に使うかが分かる名前）
+   - Expiration: 90 日くらい。期限が近づくとメールが届くので、そのときに作り直す（Regenerate token）
+   - Repository access: このリポジトリだけ
+   - Permissions: Issues を Read and write（Metadata の Read は自動で付く）。ラベルの作成もこの権限でできる
+2. トークンをパスワード管理ツールなどに保存する（作り直しのたびに使う）
+3. ターミナルで `gh auth login` を実行し、次のように選ぶ
+
+```
+? Where do you use GitHub?                       → GitHub.com
+? What is your preferred protocol for Git?       → HTTPS
+? Authenticate Git with your GitHub credentials? → No
+? How would you like to authenticate GitHub CLI? → Paste an authentication token
+? Paste your authentication token:               ← トークンを貼って Enter
+```
+
+4. `gh auth status` で `Logged in to github.com account ...` と出れば終わり
+
+- 「Authenticate Git with your GitHub credentials?」は **No** にする。Yes にすると `git push` にもこのトークンが使われ、Issues の権限しかないので push が失敗するようになる
+- 「Login with a web browser」は選ばない。すべてのリポジトリを書き換えられる広い権限のトークンになる
+- `gh auth login --with-token` でも入れられるが、何も表示されずに入力を待つので分かりにくい（トークンを貼って Enter、続けて Ctrl+D）
+- トークンを AI との会話に貼らない。ターミナルで人が入力する
 
 ## 7. 変更履歴
 
 | 日付 | 変更内容 | 変更者 |
 | ---- | -------- | ------ |
 | 2026-10-03 | 新規作成 | |
+| 2026-10-04 | 「6.1 `gh` にログインする」を追加（権限を絞ったトークンを使い、ログイン情報はボリュームに残さない） | |
+| 2026-10-04 | 「2」のラベルを GitHub の既定のもの（`enhancement`・`documentation`）に合わせた。「6.1」を、実際に通った対話形式のログインの手順に書き換えた | |
